@@ -254,6 +254,21 @@ button{cursor:pointer}
 .confirm{border:1px solid var(--accent);border-radius:12px;padding:12px 14px;margin-top:10px;display:grid;gap:10px;font-size:14px}
 .confirm .row{flex-wrap:wrap}
 
+/* Galerias */
+.gal{display:grid;gap:14px;margin-top:8px}
+.gal-row{border-bottom:1px solid var(--line);padding-bottom:12px}
+.gal-h{display:flex;gap:10px;align-items:center}
+.gal-h b{font-weight:600;font-size:14px}
+.gal-h .grow{flex:1}
+.gal-strip{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+.gal-th{flex:none;width:68px;height:68px;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:var(--surface-2);position:relative}
+.gal-th.sel{border-color:var(--accent)}
+.gal-th img{width:100%;height:100%;object-fit:cover;display:block}
+.gal-av{position:absolute;inset:auto 0 0;font-size:9.5px;background:#000a;color:#fff;text-align:center;line-height:1.6}
+.gal-sel{margin-top:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;display:grid;gap:10px}
+.gal-sel p{margin:0;font-size:13.5px;color:var(--muted);font-family:var(--f-body);font-style:italic}
+.gal-sel .row{flex-wrap:wrap}
+
 /* Toast */
 .toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:50;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:10px;align-items:center;text-align:left;font-size:13.5px;animation:drop .25s ease-out}
 .toast .nt{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -309,6 +324,7 @@ button{cursor:pointer}
 <div id="sheetRoot"></div>
 <div id="toastRoot"></div>
 <input type="file" id="avatarFile" accept="image/*" hidden>
+<input type="file" id="galFile" accept="image/*" multiple hidden>
 
 <script>
 "use strict";
@@ -424,11 +440,13 @@ function newGame(keep){
       {id:uid(),who:"matt",text:"turno dobrado no grill. alguém me lembra por que eu aceitei",t:now-8*60*MIN,likes:12,rts:0,replies:[]},
     ],
     dms:{}, notifs:[], queue:[],
+    gallery: keep?.gallery || {},
   };
 }
 
 let S = loadLocal() || newGame();
-let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, lastTyping:false, feedBusy:false, twBusy:false};
+S.gallery ||= {};
+let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, galBusy:{}, galSel:null, galTarget:null, galDescBusy:false, lastTyping:false, feedBusy:false, twBusy:false};
 
 /* ============================================================
    Utilidades
@@ -499,7 +517,10 @@ function avatar(w, cls=""){
     return el;
   }
   if (p.fan) return h("div",{class:"av fan "+cls,"aria-hidden":"true"}, (p.handle[0]||"?").toUpperCase());
-  return h("div",{class:"av "+cls,style:`background:${p.color}`,"aria-hidden":"true"}, p.short[0]);
+  const el = h("div",{class:"av "+cls,style:`background:${p.color}`,"aria-hidden":"true"}, p.short[0]);
+  const g = S.gallery?.[w]?.avatar;
+  if (g) loadPhoto(g).then(u=>{ if (u){ el.textContent = ""; el.append(h("img",{src:u,alt:""})); } });
+  return el;
 }
 function fmt(text){
   const frag = document.createDocumentFragment();
@@ -584,6 +605,7 @@ async function initCloud(){
         const docs = qs.docs.filter(x=>x.exists).sort((a,b)=>a.id<b.id?-1:1);
         const story = docs.flatMap(x=>x.data().msgs||[]);
         S = {...d.data, story: story.length ? story : newGame().story};
+        S.gallery ||= {};
         lastChunkJSON = docs.map(x=>JSON.stringify(x.data().msgs||[]));
         saveLocal();
         renderAll(true);
@@ -639,9 +661,9 @@ function compressImage(file, max=760, q=0.8){
 /* ============================================================
    IA (capacidade "sample" do Claude)
    ============================================================ */
-let AI = null, canImages = false;
+let AI = null, canImages = false, imgMax = 5;
 const aiReady = (window.claude?.use ? window.claude.use("sample") : Promise.resolve(null))
-  .then(s=>{ AI = s; if (!s) $("#aiBanner").hidden = false; else s.limits?.().then(l=>{ canImages = !!l?.images; }).catch(()=>{}); return s; })
+  .then(s=>{ AI = s; if (!s) $("#aiBanner").hidden = false; else s.limits?.().then(l=>{ canImages = !!l?.images; imgMax = l?.images?.maxCount || 5; }).catch(()=>{}); return s; })
   .catch(()=>{ $("#aiBanner").hidden = false; return null; });
 function errMsg(e){
   switch (e?.code){
@@ -863,7 +885,8 @@ function scheduleStoryEvent(ev, turn, delay=0){
       addNotif({kind:"tweet", who:w, tab:"twitter", ref:tw.id, text:`@${hd(w)} tuitou: ${text}`, turn});
       S.story.push({id:uid(), role:"sys", kind:"tweet", who:w, ref:tw.id, text:`${nm(w)} tuitou`, turn, t:Date.now()});
     } else if (ev.tipo==="insta"){
-      const p = {id:uid(), who:w, desc:String(ev.descricao||"").trim(), caption:String(ev.legenda||"").trim(), likes:clampN(ev.curtidas,3,5000,40), t:Date.now(), comments:[], turn};
+      const g = pickPhoto(w, ev.foto);
+      const p = {id:uid(), who:w, photo:g?.id||null, desc:String(ev.descricao||g?.desc||"").trim(), caption:String(ev.legenda||"").trim(), likes:clampN(ev.curtidas,3,5000,40), t:Date.now(), comments:[], turn};
       if (!p.desc && !p.caption) return;
       (ev.comentarios||[]).slice(0,4).forEach((c,i)=>{ const t = String(c.texto||"").trim(); if (t) p.comments.push({id:uid(), who:resolveWho(c.quem), text:t, t:Date.now()+i, turn}); });
       S.insta.feed.push(p);
@@ -893,10 +916,12 @@ ${socialContext()}
 
 Decida se, neste ponto da história, algum personagem que NÃO está na cena com a Gabrielle mandaria uma DM para ela ou postaria algo. Na maioria das vezes, algo pequeno e cotidiano, coerente com o que esse personagem sabe e sente. As redes dão textura e às vezes uma pista pequena; nada de resolver mistérios ou criar reviravoltas. O Klaus aparece raramente, e sempre com intenção. Quem está na cena com ela não manda DM. Pode ser que nada aconteça.
 
+${galleryText()}
+
 Responda só com JSON: {"eventos":[...]} com 0 a 2 eventos, nestes formatos:
 {"tipo":"dm","quem":"elena","texto":"..."}
 {"tipo":"tweet","quem":"caroline","texto":"..."}
-{"tipo":"insta","quem":"stefan","descricao":"o que a foto mostra","legenda":"...","curtidas":60,"comentarios":[{"quem":"damon","texto":"..."}]}
+{"tipo":"insta","quem":"stefan","foto":"id da galeria ou null","descricao":"o que a foto mostra","legenda":"...","curtidas":60,"comentarios":[{"quem":"damon","texto":"..."}]}
 Use em "quem" um destes ids: ${CHAR_IDS.join(", ")}.`);
     if (S.turn !== turn) return;
     const evs = Array.isArray(res?.eventos) ? res.eventos.slice(0,2) : [];
@@ -1083,14 +1108,17 @@ ${castText()}
 REDES AGORA:
 ${socialContext({dms:false})}
 
+${galleryText()}
+
 Escreva 1 a 3 posts de personagens diferentes (quem costuma postar). Cada post tem uma foto descrita em uma frase, legenda na voz do personagem e 1 a 4 comentários de outros (podem incluir perfis aleatórios da cidade). Cotidiano, com subtexto às vezes; nada de revelar mistérios. O Klaus quase nunca posta; se postar, é arte ou um lugar, nunca rosto.
 ${WHO_IDS_LINE}
-Responda só com JSON: {"posts":[{"quem":"caroline","descricao":"o que a foto mostra","legenda":"...","curtidas":90,"minutosAtras":12,"comentarios":[{"quem":"elena","texto":"..."}]}]}`);
+Responda só com JSON: {"posts":[{"quem":"caroline","foto":"id da galeria ou null","descricao":"o que a foto mostra","legenda":"...","curtidas":90,"minutosAtras":12,"comentarios":[{"quem":"elena","texto":"..."}]}]}`);
     const posts = Array.isArray(res?.posts) ? res.posts.slice(0,3) : [];
     posts.forEach(pp=>{
       const w = resolveWho(pp.quem); if (w==="gabi") return;
       const t = Date.now() - clampN(pp.minutosAtras,0,600,10)*MIN;
-      const p = {id:uid(), who:w, desc:String(pp.descricao||"").trim(), caption:String(pp.legenda||"").trim(), likes:clampN(pp.curtidas,1,50000,40), t, comments:[]};
+      const g = pickPhoto(w, pp.foto);
+      const p = {id:uid(), who:w, photo:g?.id||null, desc:String(pp.descricao||g?.desc||"").trim(), caption:String(pp.legenda||"").trim(), likes:clampN(pp.curtidas,1,50000,40), t, comments:[]};
       (Array.isArray(pp.comentarios)?pp.comentarios:[]).slice(0,4).forEach((c,i)=>{ const tx = String(c?.texto||"").trim(); if (tx) p.comments.push({id:uid(), who:resolveWho(c.quem), text:tx, t:t+(i+1)*MIN}); });
       S.insta.feed.push(p);
     });
@@ -1098,6 +1126,112 @@ Responda só com JSON: {"posts":[{"quem":"caroline","descricao":"o que a foto mo
     markDirty();
   }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
   finally{ UI.feedBusy = false; renderInsta(); }
+}
+
+/* ============================================================
+   Galerias dos personagens
+   ============================================================ */
+function usedPhotos(){ return new Set(S.insta.feed.map(p=>p.photo).filter(Boolean)); }
+function galleryText(){
+  const used = usedPhotos(); const L = [];
+  for (const id of CHAR_IDS){
+    const ph = S.gallery?.[id]?.photos || []; if (!ph.length) continue;
+    const sorted = [...ph.filter(x=>!used.has(x.id)), ...ph.filter(x=>used.has(x.id))].slice(0,14);
+    L.push(`- ${id}: ` + sorted.map(x=>`[${x.id}] ${x.desc||"(sem descrição)"}${used.has(x.id)?" (já postada)":""}`).join("; "));
+  }
+  if (!L.length) return "";
+  return `GALERIAS DE FOTOS REAIS (a Gabi escolheu estas fotos para cada personagem):
+${L.join("\n")}
+Se quem posta tiver galeria, escolha em "foto" o id da foto que melhor combina com o post (prefira uma ainda não postada) e escreva a legenda e a "descricao" a partir dessa foto. Quando fizer sentido, prefira que postem os personagens que têm galeria. Para quem não tem galeria, use "foto": null.`;
+}
+function pickPhoto(w, raw){
+  const ph = S.gallery?.[w]?.photos || []; if (!ph.length || raw==null) return null;
+  const want = String(raw).replace(/[\[\]]/g,"").trim();
+  if (!want || want==="null") return null;
+  const hit = ph.find(x=>x.id===want); if (hit) return hit;
+  const used = usedPhotos(); const free = ph.filter(x=>!used.has(x.id)); const pool = free.length ? free : ph;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function dataURLtoBlob(d){
+  const [head, b64] = d.split(","); const mime = (head.match(/data:([^;]+)/)||[])[1] || "image/jpeg";
+  const bin = atob(b64); const arr = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+async function addGallery(w, files){
+  if (!CHARS[w] || !files.length) return;
+  UI.galBusy[w] = true; renderFicha();
+  const g = (S.gallery[w] ||= {photos:[], avatar:null});
+  const items = [];
+  for (const f of files.slice(0,20)){
+    try{
+      const img = await fitPhoto(f);
+      const id = "g-" + uid();
+      await storePhoto(id, img.dataURL);
+      const it = {id, desc:"", t:Date.now()};
+      g.photos.push(it); items.push({it, blob:img.blob});
+      markDirty(); renderFicha();
+    }catch{ toast({text:"Uma das imagens não abriu. Tente outra."}); }
+  }
+  UI.galBusy[w] = false; renderFicha();
+  await describeGallery(w, items);
+}
+async function describeGallery(w, items){
+  await aiReady;
+  if (!AI || !canImages || !items.length) return;
+  UI.galDescBusy = true; renderFicha();
+  const max = Math.max(1, imgMax);
+  try{
+    for (let i=0;i<items.length;i+=max){
+      const batch = items.slice(i,i+max);
+      const res = await askJSON(`Estas ${batch.length} fotos foram escolhidas pela Gabi para representar ${CHARS[w].name} (The Vampire Diaries) num RPG. Elas vão aparecer como posts do Instagram desse personagem. Descreva cada foto em uma frase curta e concreta: o que aparece, cenário, roupa, luz e clima. Não cite nomes de atores. Responda só com JSON, na mesma ordem das fotos: {"fotos":["...","..."]}`, {images: batch.map(b=>b.blob)});
+      const arr = Array.isArray(res?.fotos) ? res.fotos : [];
+      batch.forEach((b,k)=>{ const d = String(arr[k]||"").trim(); if (d) b.it.desc = d; });
+      markDirty(); renderFicha();
+    }
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+  finally{ UI.galDescBusy = false; renderFicha(); }
+}
+async function describeMissing(){
+  for (const id of CHAR_IDS){
+    const ph = (S.gallery[id]?.photos || []).filter(x=>!x.desc);
+    if (!ph.length) continue;
+    const items = [];
+    for (const it of ph){ const d = await loadPhoto(it.id); if (d) items.push({it, blob:dataURLtoBlob(d)}); }
+    await describeGallery(id, items);
+  }
+}
+function removeGal(w, id){
+  const g = S.gallery[w]; if (!g) return;
+  g.photos = g.photos.filter(x=>x.id!==id);
+  if (g.avatar===id) g.avatar = null;
+  UI.galSel = null; dropPhoto(id); markDirty(); renderFicha();
+}
+function galleryPanel(){
+  const wrap = h("div",{class:"gal"});
+  for (const id of CHAR_IDS){
+    const g = S.gallery[id] || {photos:[]};
+    const n = g.photos.length;
+    const strip = n ? h("div",{class:"gal-strip"}, g.photos.map(ph=>{
+      const img = h("img",{alt:ph.desc||"Foto de "+CHARS[id].short,loading:"lazy"});
+      loadPhoto(ph.id).then(u=>{ if (u) img.src = u; });
+      return h("button",{class:"gal-th"+(UI.galSel?.id===ph.id?" sel":""),"aria-label":"Ver foto",onclick:()=>{ UI.galSel = UI.galSel?.id===ph.id ? null : {who:id, id:ph.id}; renderFicha(); }}, img, g.avatar===ph.id ? h("span",{class:"gal-av"},"perfil") : null);
+    })) : null;
+    let sel = null;
+    if (UI.galSel?.who===id){
+      const ph = g.photos.find(x=>x.id===UI.galSel.id);
+      if (ph) sel = h("div",{class:"gal-sel"},
+        h("p",null, ph.desc || (UI.galDescBusy ? "A IA está olhando a foto…" : "Ainda sem descrição. Sem ela, a IA escolhe essa foto às cegas.")),
+        h("div",{class:"row"},
+          h("button",{class:"btn sm",onclick:()=>{ g.avatar = g.avatar===ph.id ? null : ph.id; markDirty(); renderFicha(); }}, g.avatar===ph.id ? "Tirar da foto de perfil" : "Usar como foto de perfil"),
+          h("button",{class:"btn ghost sm",onclick:()=>{ if (UI.galSel.confirm) removeGal(id, ph.id); else { UI.galSel.confirm = true; renderFicha(); } }}, UI.galSel.confirm ? "Toque de novo para apagar" : "Apagar")));
+    }
+    wrap.append(h("div",{class:"gal-row"},
+      h("div",{class:"gal-h"}, avatar(id,"sm"), h("b",null,CHARS[id].name), h("span",{class:"meta"}, n ? `${n} ${n===1?"foto":"fotos"}` : "sem fotos"), h("span",{class:"grow"}),
+        h("button",{class:"btn sm",disabled:!!UI.galBusy[id],onclick:()=>{ UI.galTarget = id; $("#galFile").click(); }}, UI.galBusy[id] ? "Enviando…" : "Adicionar")),
+      strip, sel));
+  }
+  return wrap;
 }
 
 /* ============================================================
@@ -1334,7 +1468,10 @@ function postTile(p){
     p.status==="analyzing" ? h("span",{class:"an"},"vendo sua foto…") : (p.comments.length ? h("span",{class:"cc"}, String(p.comments.length)) : null));
 }
 function photoBlock(p){
-  if (p.photo){ const img = h("img",{class:"realphoto",alt:p.caption||"Foto"}); loadPhoto(p.photo).then(u=>{ if (u) img.src = u; }); return img; }
+  if (p.photo){ const img = h("img",{class:"realphoto",alt:p.caption||"Foto"}); loadPhoto(p.photo).then(u=>{ if (u) img.src = u; else img.replaceWith(fakePhoto(p)); }); return img; }
+  return fakePhoto(p);
+}
+function fakePhoto(p){
   const c = CHARS[p.who]?.color || "#5b4a50";
   return h("div",{class:"fakephoto",style:`background:linear-gradient(160deg, ${c}, #1b1418)`}, h("small",null,"foto"), h("p",null,p.desc||p.caption));
 }
@@ -1515,6 +1652,7 @@ function renderThread(w, scrollEnd){
 function renderFicha(){
   const root = $("#fichaRoot"); if (!root || UI.tab!=="ficha") return;
   const focusedId = document.activeElement?.id;
+  const fichaScroll = $("#v-ficha").scrollTop;
   const fields = FICHA_FIELDS.map(([k,label,rows])=>h("div",{class:"f"}, h("label",{for:"f-"+k},label),
     rows===1 ? h("input",{id:"f-"+k,value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; markDirty(); }})
              : h("textarea",{id:"f-"+k,rows:String(rows),value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; fitTA(e.target); markDirty(); }})));
@@ -1524,6 +1662,11 @@ function renderFicha(){
     h("p",{class:"lead"},"Tudo aqui vai para o narrador e para os personagens. Edite quando quiser; vale a partir da próxima resposta."),
     ...fields,
     h("div",{class:"f"}, h("label",{for:"f-rules"},"Regras do narrador"), h("textarea",{id:"f-rules",rows:"5",value:S.rules,oninput:(e)=>{ S.rules=e.target.value; fitTA(e.target); markDirty(); }})),
+    h("h2",null,"Galerias dos personagens"),
+    h("p",{class:"lead"},"Fotos que os personagens usam quando postam no Insta. A IA olha cada foto e escolhe a que combina com o post. Toque numa foto para usar como foto de perfil ou apagar."),
+    (()=>{ const missing = CHAR_IDS.some(id=>(S.gallery[id]?.photos||[]).some(x=>!x.desc));
+      return missing ? h("button",{class:"btn sm",disabled:UI.galDescBusy,onclick:describeMissing}, UI.galDescBusy ? "Descrevendo…" : "Descrever fotos sem descrição") : null; })(),
+    galleryPanel(),
     h("h2",null,"Memória do mundo"),
     h("p",{class:"lead"},"Um resumo do que já aconteceu. Ele se atualiza sozinho a cada 5 turnos, e você pode corrigir à mão."),
     h("div",{class:"memory"},
@@ -1538,13 +1681,14 @@ function renderFicha(){
         : h("button",{class:"btn ghost",onclick:()=>{ UI.confirmReset=true; renderFicha(); }},"Recomeçar do zero"))
   );
   root.querySelectorAll("textarea").forEach(fitTA);
+  $("#v-ficha").scrollTop = fichaScroll;
   if (focusedId){ const el = document.getElementById(focusedId); el?.focus(); }
 }
 function fitTA(t){ t.style.height = "auto"; t.style.height = (t.scrollHeight + 2) + "px"; }
 function resetGame(){
   narrCtl?.abort();
   S.insta.posts.forEach(p=>dropPhoto(p.photo));
-  S = newGame({ficha:S.ficha, rules:S.rules, insta:S.insta});
+  S = newGame({ficha:S.ficha, rules:S.rules, insta:S.insta, gallery:S.gallery});
   UI.confirmReset = false; UI.streaming = null; UI.storyErr = null; UI.thread = null; UI.sheet = null;
   persist();
   setTab("historia");
@@ -1577,6 +1721,7 @@ $("#avatarFile").addEventListener("change", async (e)=>{
   try{ const img = await compressImage(f, 320, 0.85); const id = "avatar-"+uid(); const old = S.insta.avatar; await storePhoto(id, img.dataURL); S.insta.avatar = id; if (old) dropPhoto(old); markDirty(); renderAll(); }
   catch{ toast({text:"Não deu para abrir essa imagem. Tente outra."}); }
 });
+$("#galFile").addEventListener("change",(e)=>{ const files = Array.from(e.target.files||[]); e.target.value = ""; if (UI.galTarget) addGallery(UI.galTarget, files); });
 document.addEventListener("visibilitychange",()=>{ if (document.hidden) persist(); });
 window.addEventListener("pagehide", persist);
 
