@@ -1,0 +1,1590 @@
+<title>Gabrielle Salvatore</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: uma coluna do tamanho de um celular. Cabeçalho, a aba aberta rolando no meio, e embaixo o campo de texto e as abas. */
+:root{
+  --bg:#f7f2ec; --surface:#fffcf8; --surface-2:#efe6dd; --line:#dccdc1;
+  --fg:#2b2125; --muted:#6f5f63; --faint:#9a898d;
+  --accent:#9b1d33; --accent-ink:#fff8f2; --accent-soft:#9b1d3316;
+  --rose:#a3485a; --gold:#9c7529; --gold-soft:#9c752920;
+  --bubble-me:#9b1d33; --bubble-me-ink:#fff8f2; --bubble-them:#ece2d8;
+  --scrim:#1a121566; --shadow:0 12px 32px #2b212524;
+  --f-display:"Cormorant Garamond","Cormorant",Georgia,serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-ui:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#130f11; --surface:#1b1619; --surface-2:#251d21; --line:#3a2d33;
+    --fg:#ece2d7; --muted:#ab9b95; --faint:#76686c;
+    --accent:#c0304a; --accent-ink:#fff6f0; --accent-soft:#c0304a24;
+    --rose:#e09aa6; --gold:#d1ab5f; --gold-soft:#d1ab5f1f;
+    --bubble-me:#8e1f33; --bubble-me-ink:#fff3ee; --bubble-them:#2a2126;
+    --scrim:#000000a0; --shadow:0 12px 32px #00000070;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#130f11; --surface:#1b1619; --surface-2:#251d21; --line:#3a2d33;
+  --fg:#ece2d7; --muted:#ab9b95; --faint:#76686c;
+  --accent:#c0304a; --accent-ink:#fff6f0; --accent-soft:#c0304a24;
+  --rose:#e09aa6; --gold:#d1ab5f; --gold-soft:#d1ab5f1f;
+  --bubble-me:#8e1f33; --bubble-me-ink:#fff3ee; --bubble-them:#2a2126;
+  --scrim:#000000a0; --shadow:0 12px 32px #00000070;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:15px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.app{height:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);border-inline:1px solid var(--line)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Cabeçalho */
+.top{flex:none;display:flex;align-items:center;gap:12px;padding-block:12px;border-bottom:1px solid var(--fg);position:relative;background:var(--bg);z-index:5}
+.mono{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-family:var(--f-display);font-size:21px;font-weight:600;flex:none}
+.top h1{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-display);font-weight:600;font-size:23px;line-height:1.05;letter-spacing:.01em}
+.top .sub{font-size:12.5px;color:var(--rose);letter-spacing:.02em}
+.top .grow{flex:1;min-width:0}
+.pill{font-size:11.5px;color:var(--rose);border:1px solid var(--fg);border-radius:999px;padding:3px 11px;white-space:nowrap}
+.pill.err{color:var(--accent);border-color:var(--accent)}
+.sub .st{display:none}
+.sub .st.err{color:var(--accent)}
+@media (max-width:480px){ .pill{display:none} .sub .st{display:inline} }
+.bell{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;display:grid;place-items:center;flex:none}
+.bell svg{width:18px;height:18px}
+.badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-size:10.5px;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.notifs{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(100% + 6px);width:min(360px,calc(100vw - 32px));max-height:60vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);z-index:30}
+.notifs header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:600;font-size:13px}
+.notifs header button{background:none;border:0;color:var(--rose);font-size:12.5px}
+.nrow{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);width:100%;text-align:left;background:none;border-inline:0;border-top:0;align-items:flex-start}
+.nrow.unread{background:var(--accent-soft)}
+.nrow .nt{font-size:13.5px;line-height:1.35;min-width:0;flex:1;overflow-wrap:anywhere}
+.nrow time{font-size:11.5px;color:var(--faint);white-space:nowrap}
+.empty-n{padding:22px 14px;color:var(--muted);font-size:13.5px}
+
+.banner{margin:14px 0 4px;border:1px solid var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px;color:var(--fg);background:var(--accent-soft)}
+
+/* Vistas */
+.views{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.view-inner{padding-block:8px 28px}
+
+/* História */
+.msg{margin:22px 0}
+.lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);margin-bottom:6px;display:flex;gap:10px;align-items:center}
+.narr{border-left:2px solid var(--accent);padding-left:18px}
+.narr .txt,.gabi .txt{font-family:var(--f-body);font-size:17px;line-height:1.72;color:var(--fg)}
+.txt p{margin:0 0 .85em}
+.txt p:last-child{margin-bottom:0}
+.gabi{border-left:2px solid var(--gold);padding-left:18px}
+.gabi .lbl{color:var(--gold)}
+.gabi .txt{color:var(--muted);font-style:italic}
+.sys{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:13px;color:var(--muted)}
+.sys::before,.sys::after{content:"";height:1px;flex:1;background:var(--line)}
+.sys button{background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--fg);display:flex;gap:7px;align-items:center;font-size:12.5px;max-width:80%}
+.sys button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sys svg{width:14px;height:14px;flex:none;color:var(--accent)}
+.thinking{color:var(--faint);font-family:var(--f-body);font-style:italic;font-size:16px}
+.thinking::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.errbox{margin:18px 0;padding:12px 14px;border:1px dashed var(--accent);border-radius:12px;font-size:13.5px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+
+/* Rodapé */
+.foot{flex:none;background:var(--bg);border-top:1px solid var(--fg)}
+.composer{padding-block:10px 4px}
+.actions{display:flex;gap:16px;justify-content:flex-end;min-height:0}
+.actions:empty{display:none}
+.actions button{background:none;border:0;padding:2px 0 8px;font-size:12.5px;color:var(--rose);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+.row{display:flex;gap:10px;align-items:flex-end}
+.field{flex:1;min-width:0;border:1px solid var(--fg);border-radius:12px;background:var(--surface);padding:10px 14px;font-family:var(--f-body);font-size:16px;line-height:1.45;resize:none;max-height:40vh;min-height:46px;display:block;width:100%}
+.field::placeholder{color:var(--faint)}
+.send{border:0;background:none;color:var(--accent);font-weight:600;padding:10px 6px;font-size:15px;flex:none}
+.send:disabled{color:var(--faint);cursor:default}
+.send.stop{color:var(--fg)}
+.hint{font-size:11.5px;color:var(--rose);padding:4px 0 2px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--fg);padding-bottom:4px}
+.tab{background:none;border:0;padding:10px 2px 9px;font-size:13px;color:var(--rose);position:relative;border-top:2px solid transparent;margin-top:-1px}
+.tab[aria-selected="true"]{color:var(--fg);border-top-color:var(--accent);font-weight:500}
+.tab .dot{position:absolute;top:7px;left:calc(50% + 22px);width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
+/* Botões */
+.btn{border:1px solid var(--fg);background:transparent;border-radius:999px;padding:7px 16px;font-size:13.5px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{border-color:var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sm{padding:5px 12px;font-size:12.5px}
+
+/* Avatares */
+.av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:600;color:#fff;background:var(--surface-2);overflow:hidden;font-family:var(--f-ui);letter-spacing:.02em}
+.av.fan{color:var(--muted);border:1px solid var(--line)}
+.av.me{background:var(--accent);color:var(--accent-ink);font-family:var(--f-display);font-size:16px}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.sm{width:28px;height:28px;font-size:11px}
+.av.lg{width:84px;height:84px;font-size:30px;border:2px solid var(--gold)}
+
+/* Insta */
+.prof{display:flex;gap:18px;align-items:center;padding-top:18px}
+.prof .stats{display:flex;gap:18px;flex-wrap:wrap}
+.stat b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.prof-name{margin-top:12px;font-weight:600}
+.prof-bio{font-size:14px;color:var(--muted);white-space:pre-line}
+.seg{display:flex;gap:6px;margin:16px 0 12px;align-items:center;flex-wrap:wrap}
+.seg .grow{flex:1}
+.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--fg);color:var(--fg);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.tile{aspect-ratio:1;max-width:100%;background:var(--surface-2);border:0;padding:0;position:relative;overflow:hidden}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .cc{position:absolute;bottom:5px;right:6px;font-size:11.5px;color:#fff;text-shadow:0 1px 3px #000a;font-weight:600}
+.tile .an{position:absolute;inset:auto 0 0;padding:4px 6px;font-size:10.5px;color:#fff;background:#0008}
+.newpost{border:1px solid var(--line);border-radius:14px;padding:14px;margin:6px 0 14px;display:grid;gap:10px;background:var(--surface)}
+.newpost .pv{max-height:260px;width:100%;object-fit:cover;border-radius:8px;display:block}
+.drop{border:1px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);font-size:13.5px;cursor:pointer}
+.emptyst{padding:28px 6px;color:var(--muted);font-size:14px;text-align:center;font-family:var(--f-body);font-style:italic}
+.card{border-bottom:1px solid var(--line);padding:14px 0 16px}
+.card-h{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.card-h .who{font-weight:600;font-size:14px}
+.card-h time,.meta{font-size:12px;color:var(--faint)}
+.fakephoto{aspect-ratio:4/5;max-width:100%;border-radius:4px;display:flex;align-items:flex-end;padding:22px;color:#f7efe6;position:relative;overflow:hidden}
+.fakephoto::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 20% 10%,#ffffff22,transparent 60%),linear-gradient(180deg,transparent 40%,#0000008c)}
+.fakephoto p{position:relative;margin:0;font-family:var(--f-body);font-style:italic;font-size:16px;line-height:1.5;text-shadow:0 1px 3px #0008}
+.fakephoto small{position:absolute;top:14px;left:16px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.realphoto{width:100%;max-width:100%;border-radius:4px;display:block;background:var(--surface-2)}
+.likes{display:flex;gap:14px;align-items:center;margin:10px 0 6px;font-size:13.5px}
+.heart{background:none;border:0;padding:0;display:flex;gap:6px;align-items:center;color:var(--fg)}
+.heart svg{width:20px;height:20px}
+.heart[aria-pressed="true"] svg{color:var(--accent);fill:var(--accent)}
+.cap{font-size:14px;overflow-wrap:anywhere}
+.cap b{margin-right:6px}
+.cmt{font-size:14px;margin-top:6px;overflow-wrap:anywhere;display:flex;gap:8px;align-items:flex-start}
+.cmt .c-body{flex:1;min-width:0}
+.cmt b{margin-right:6px}
+.cmt .c-meta{font-size:11.5px;color:var(--faint);display:flex;gap:12px;margin-top:1px}
+.cmt .c-meta button{background:none;border:0;padding:0;color:var(--faint);font-size:11.5px;font-weight:600}
+.more{background:none;border:0;padding:4px 0;color:var(--faint);font-size:13px}
+.status{font-size:12.5px;color:var(--rose);font-style:italic;margin-top:6px}
+.inline-reply{display:flex;gap:8px;margin-top:12px;align-items:center}
+.inline-reply input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:14px}
+.inline-reply button{background:none;border:0;color:var(--accent);font-weight:600;font-size:14px;padding:6px 2px}
+.inline-reply button:disabled{color:var(--faint)}
+
+/* Folha de post */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;justify-content:center;align-items:flex-end}
+.sheet-in{background:var(--bg);width:100%;max-width:760px;max-height:94%;overflow:auto;border-radius:18px 18px 0 0;padding-block:6px max(20px,env(safe-area-inset-bottom,0px))}
+.sheet-bar{display:flex;justify-content:space-between;align-items:center;padding-block:8px;position:sticky;top:0;background:var(--bg);z-index:2}
+.x{background:none;border:0;font-size:14px;color:var(--rose);padding:6px 0}
+
+/* Twitter */
+.tw-compose{border-bottom:1px solid var(--line);padding:16px 0 14px;display:grid;gap:8px}
+.tw-compose textarea{border:0;background:transparent;font-size:17px;resize:none;min-height:56px;width:100%;font-family:var(--f-ui);padding:0}
+.tw-compose textarea:focus-visible{outline:none}
+.tw-compose .row{justify-content:space-between;align-items:center}
+.count{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.tw{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.tw .body{flex:1;min-width:0}
+.tw .head{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;font-size:14px}
+.tw .head b{font-weight:600}
+.tw .head span{color:var(--faint);font-size:13px}
+.tw .text{font-size:15px;margin-top:2px;overflow-wrap:anywhere;white-space:pre-wrap}
+.tw .bar{display:flex;gap:22px;margin-top:8px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tw .bar button{background:none;border:0;padding:0;color:inherit;display:flex;gap:6px;align-items:center}
+.tw .bar svg{width:16px;height:16px}
+.tw .bar [aria-pressed="true"]{color:var(--accent)}
+.tw .bar [aria-pressed="true"] svg{fill:var(--accent)}
+.replies{margin-top:10px;border-left:1px solid var(--line);padding-left:12px;display:grid;gap:10px}
+.rep{display:flex;gap:8px;font-size:14px}
+.rep .rb{min-width:0;flex:1;overflow-wrap:anywhere}
+.rep .rh{font-size:13px}
+.rep .rh span{color:var(--faint)}
+
+/* DMs */
+.dm-list{display:grid}
+.dm-row{display:flex;gap:12px;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;width:100%;align-items:center}
+.dm-row .mid{flex:1;min-width:0}
+.dm-row .mid b{display:block;font-weight:600;font-size:14.5px}
+.dm-row .mid span{display:block;font-size:13.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm-row.unread .mid span{color:var(--fg);font-weight:500}
+.dm-row .r{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:11.5px;color:var(--faint)}
+.udot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.people{display:flex;gap:12px;overflow-x:auto;padding:6px 0 14px;scrollbar-width:none}
+.people::-webkit-scrollbar{display:none}
+.person{background:none;border:0;display:grid;justify-items:center;gap:5px;font-size:11.5px;color:var(--muted);flex:none;width:58px}
+.person .av{width:48px;height:48px;font-size:15px}
+.sect{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);margin:18px 0 6px}
+.thread{display:flex;flex-direction:column;height:100%}
+.th-head{display:flex;gap:10px;align-items:center;padding-block:10px;border-bottom:1px solid var(--line);flex:none;background:var(--bg)}
+.th-head b{font-weight:600}
+.th-head small{display:block;font-size:12px;color:var(--faint)}
+.back{background:none;border:0;font-size:22px;line-height:1;padding:2px 6px 2px 0;color:var(--fg)}
+.bubbles{flex:1;overflow-y:auto;padding-block:14px;display:flex;flex-direction:column;gap:4px}
+.bub{max-width:78%;padding:8px 13px;border-radius:18px;font-size:15px;line-height:1.38;overflow-wrap:anywhere;white-space:pre-wrap}
+.bub.me{align-self:flex-end;background:var(--bubble-me);color:var(--bubble-me-ink);border-bottom-right-radius:6px}
+.bub.them{align-self:flex-start;background:var(--bubble-them);color:var(--fg);border-bottom-left-radius:6px}
+.bub + .bub.gap{margin-top:10px}
+.stamp{align-self:center;font-size:11px;color:var(--faint);margin:10px 0 4px}
+.typing{align-self:flex-start;background:var(--bubble-them);border-radius:18px;padding:10px 14px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.th-input{flex:none;padding-block:8px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end}
+.th-input textarea{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:9px 15px;resize:none;font-size:15px;max-height:120px;min-height:40px}
+
+/* Ficha */
+.ficha h2{font-family:var(--f-display);font-weight:600;font-size:28px;margin:22px 0 2px;text-wrap:balance}
+.ficha .lead{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.f{display:grid;gap:5px;margin:14px 0}
+.f label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
+.f textarea,.f input{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;font-family:var(--f-body);font-size:15.5px;line-height:1.55;resize:vertical;width:100%}
+.memory{border:1px solid var(--gold);background:var(--gold-soft);border-radius:12px;padding:14px;margin-top:8px}
+.memory .f{margin:0 0 10px}
+.memory .f label{color:var(--gold)}
+.memrow{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.danger{margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
+.danger p{font-size:13.5px;color:var(--muted);margin:0 0 10px}
+.confirm{border:1px solid var(--accent);border-radius:12px;padding:12px 14px;margin-top:10px;display:grid;gap:10px;font-size:14px}
+.confirm .row{flex-wrap:wrap}
+
+/* Toast */
+.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:50;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:10px;align-items:center;text-align:left;font-size:13.5px;animation:drop .25s ease-out}
+.toast .nt{flex:1;min-width:0;overflow-wrap:anywhere}
+@keyframes drop{from{transform:translate(-50%,-14px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+</style>
+
+<div class="app" id="app">
+  <header class="top gut">
+    <div class="mono" aria-hidden="true">S</div>
+    <div class="grow">
+      <h1>Gabrielle Salvatore</h1>
+      <div class="sub"><span id="place">Mystic Falls</span><span class="st" id="saveSub"> · salvo neste aparelho</span></div>
+    </div>
+    <span class="pill" id="savePill">salvo neste aparelho</span>
+    <button class="bell" id="bellBtn" aria-label="Notificações" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="badge" id="bellBadge" hidden>0</span>
+    </button>
+    <div class="notifs" id="notifPanel" hidden></div>
+  </header>
+
+  <main class="views">
+    <section class="view" id="v-historia" role="tabpanel">
+      <div class="view-inner gut">
+        <div class="banner" id="aiBanner" hidden>A IA só funciona com a página aberta no Claude. Você ainda pode ler tudo e editar a ficha.</div>
+        <div id="storyList"></div>
+      </div>
+    </section>
+    <section class="view" id="v-insta" role="tabpanel" hidden><div class="view-inner gut" id="instaRoot"></div></section>
+    <section class="view" id="v-twitter" role="tabpanel" hidden><div class="view-inner gut" id="twRoot"></div></section>
+    <section class="view" id="v-dms" role="tabpanel" hidden><div id="dmRoot" style="height:100%"></div></section>
+    <section class="view" id="v-ficha" role="tabpanel" hidden><div class="view-inner gut ficha" id="fichaRoot"></div></section>
+  </main>
+
+  <footer class="foot">
+    <div class="composer gut" id="composer">
+      <div class="actions" id="storyActions"></div>
+      <div class="row">
+        <textarea class="field" id="storyInput" rows="1" placeholder="O que a Gabrielle diz ou faz…"></textarea>
+        <button class="send" id="sendBtn">Enviar</button>
+      </div>
+      <div class="hint">Você narra a Gabrielle. O narrador cuida do mundo, dos outros personagens e sabe o que rola nas redes.</div>
+    </div>
+    <nav class="tabs gut" role="tablist" id="tabs">
+      <button class="tab" role="tab" data-tab="historia" aria-selected="true">História</button>
+      <button class="tab" role="tab" data-tab="insta" aria-selected="false">Insta</button>
+      <button class="tab" role="tab" data-tab="twitter" aria-selected="false">Twitter</button>
+      <button class="tab" role="tab" data-tab="dms" aria-selected="false">DMs</button>
+      <button class="tab" role="tab" data-tab="ficha" aria-selected="false">Ficha</button>
+    </nav>
+  </footer>
+</div>
+<div id="sheetRoot"></div>
+<div id="toastRoot"></div>
+<input type="file" id="avatarFile" accept="image/*" hidden>
+
+<script>
+"use strict";
+/* ============================================================
+   Elenco, ficha e textos iniciais
+   ============================================================ */
+const CHARS = {
+  damon:{name:"Damon Salvatore",short:"Damon",handle:"damonsalvatore",color:"#34466b",
+    voice:"Irmão mais velho da Gabrielle. Sarcástico, charmoso, perigoso, sempre com bourbon na mão, faz piada na pior hora. Protetor do jeito mais irritante possível. Detesta o Klaus perto da irmã. Online escreve em minúsculas, frases curtas e ácidas.",
+    redes:"Twitter ativo e debochado. Quase não posta no Insta, mas comenta e implica."},
+  stefan:{name:"Stefan Salvatore",short:"Stefan",handle:"stefansalvatore",color:"#4a5a45",
+    voice:"Irmão mais novo. Contido, observador, gentil, carrega culpa. Desconfia de que existe algo mal resolvido entre a Gabrielle e o Klaus. Escreve frases completas e cuidadosas, às vezes uma pergunta que corta fundo.",
+    redes:"Posta pouco: fotos em preto e branco, livros, estrada. Raramente tuita."},
+  elena:{name:"Elena Gilbert",short:"Elena",handle:"elenagilbert",color:"#7a5640",
+    voice:"Humana, a doppelgänger da Katherine. Calorosa, corajosa, curiosa sobre a irmã dos Salvatore que nunca tinha conhecido. Escreve de forma gentil e direta.",
+    redes:"Insta com fotos do dia a dia e dos amigos. Tuita de vez em quando."},
+  caroline:{name:"Caroline Forbes",short:"Caroline",handle:"carolineforbes",color:"#a85873",
+    voice:"Vampira recém-transformada, organizadora compulsiva, intensa, ama redes sociais. Escreve com exclamações, CAPS em palavras-chave e alguns emojis. Fascinada pela Gabrielle (as roupas, a pose, o mistério).",
+    redes:"A mais ativa nas redes. Posta, comenta e responde tudo."},
+  bonnie:{name:"Bonnie Bennett",short:"Bonnie",handle:"bonniebennett",color:"#654a78",
+    voice:"Bruxa da linhagem Bennett. Desconfiada de vampiros, leal à Elena, direta e seca quando sente perigo.",
+    redes:"Usa pouco. Comentários curtos, às vezes uma indireta."},
+  klaus:{name:"Klaus Mikaelson",short:"Klaus",handle:"niklaus",color:"#7a2232",
+    voice:"Original. Ainda não se revelou para todos em Mystic Falls. Elegante, frio, cruel com charme, possessivo com a Gabrielle. Viveram um romance intenso em Nova Orleans nos anos 1910; ela foi embora quando descobriu que ele matou alguém que ela amava, e ele nunca a perdoou por ter ido. Em público é gelo; com ela perde o controle por baixo das palavras. Escreve pouco, culto, com duplo sentido. Às vezes a chama de \"love\".",
+    redes:"Perfil fechado, quase nunca comenta em público. Prefere DMs curtas e carregadas."},
+  katherine:{name:"Katherine Pierce",short:"Katherine",handle:"k.pierce",color:"#563850",
+    voice:"Manipuladora, sedutora, sempre sabe algo que ninguém sabe. Provoca por diversão. Conhece os Salvatore desde 1864.",
+    redes:"Aparece sem aviso, de uma conta discreta. Adora uma DM venenosa."},
+  elijah:{name:"Elijah Mikaelson",short:"Elijah",handle:"elijah.m",color:"#434e58",
+    voice:"Original, irmão do Klaus. Formal, cavalheiro, ameaçador com educação. Pontuação completa, nunca usa gíria.",
+    redes:"Quase não usa redes. Quando usa, é uma DM formal."},
+  jeremy:{name:"Jeremy Gilbert",short:"Jeremy",handle:"jeremygilbert",color:"#465a6b",
+    voice:"Irmão mais novo da Elena. Desenha, é meio sombrio, curioso sobre o sobrenatural.",
+    redes:"Posta desenhos de vez em quando."},
+  alaric:{name:"Alaric Saltzman",short:"Alaric",handle:"ric.saltzman",color:"#5a4e3c",
+    voice:"Professor de história e caçador de vampiros. Irônico, cansado, bebe com o Damon.",
+    redes:"Tuita pouco, quase sempre piada seca."},
+  tyler:{name:"Tyler Lockwood",short:"Tyler",handle:"tylerlockwood",color:"#3c5850",
+    voice:"Lobisomem recém-ativado, esquentado, tentando se controlar.",
+    redes:"Tuita irritado, posta treino de futebol."},
+  matt:{name:"Matt Donovan",short:"Matt",handle:"mattdonovan",color:"#55667d",
+    voice:"Humano, trabalha no Mystic Grill, gente boa, alheio a quase tudo de sobrenatural.",
+    redes:"Posta pouco, curte tudo."},
+};
+const CHAR_IDS = Object.keys(CHARS);
+
+const DEFAULT_FICHA = {
+  nome:"Gabrielle Salvatore",
+  quem:"Irmã do meio entre Damon e Stefan, nascida em Mystic Falls em 1846. Foi transformada em 1864, na mesma época que os irmãos, mas por outro caminho.",
+  personalidade:"Elegante, debochada e orgulhosa. Leal à família até o fim, mas guarda rancor por muito tempo. Não se impressiona com poder, e é por isso que o Klaus nunca a esqueceu.",
+  visual:"Cabelos ruivos, olhos claros dos Salvatore, sempre bem vestida. Usa o anel da luz do dia com o brasão da família.",
+  klaus:"Os dois se conheceram em Nova Orleans nos anos 1910 e viveram um romance intenso. Ela foi embora quando descobriu que ele tinha matado alguém que ela amava. Ele nunca a perdoou por ter ido embora, e ela nunca o perdoou pelo que ele fez.",
+  situacao:"Depois de décadas sumida, ela volta para Mystic Falls para proteger os irmãos justamente quando o Klaus chega à cidade atrás da Elena.",
+  dinamica:"O Klaus é possessivo e frio na frente dos outros, mas perde o controle quando o assunto é ela. Ela não cede fácil, então tem briga, provocação e orgulho dos dois lados. O Damon detesta o Klaus perto da irmã. O Stefan desconfia de que existe algo mal resolvido entre os dois.",
+  ondeQuando:"Mystic Falls, 2010, na época da 2ª temporada de TVD. O Klaus ainda não se revelou para todos.",
+  bio:"Voltei.",
+};
+const FICHA_FIELDS = [
+  ["nome","Nome",1],["quem","Quem é",3],["personalidade","Personalidade",3],["visual","Visual",2],
+  ["klaus","Passado com o Klaus",4],["situacao","Situação atual",3],["dinamica","Dinâmica do romance",4],
+  ["ondeQuando","Onde e quando",2],["bio","Bio do Insta",1],
+];
+const DEFAULT_RULES = [
+  "O narrador nunca escreve falas, ações, pensamentos, sentimentos ou decisões da Gabrielle. Ele narra só o mundo e os outros personagens. Gabi narra a Gabrielle.",
+  "O ritmo é devagar, com um mistério ou trama por vez e sem muitas reviravoltas ao mesmo tempo.",
+  "A qualidade tem que ser de série: tom, diálogos e tensão iguais aos de The Vampire Diaries.",
+].map(s=>"- "+s).join("\n");
+const DEFAULT_MEMORY = "Onde e quando: pensão Salvatore, Mystic Falls, outono de 2010, passa da meia-noite.\nO que aconteceu: Gabrielle acaba de voltar depois de décadas sumida. Damon e Stefan a reconheceram na sala da lareira.\nFio atual: por que ela voltou justo agora e o que ela sabe que eles não sabem.\nRelações: Damon desconfiado e magoado pelo sumiço; Stefan surpreso e atento. Klaus está chegando à cidade atrás da Elena, mas ainda não se revelou para todos.\nNas redes: nada da Gabrielle ainda.";
+const PROLOGUE = `Mystic Falls, outono de 2010. Passa da meia-noite e a neblina desce do bosque até a estrada da pensão Salvatore.
+
+Lá dentro, a lareira está acesa. Damon está de costas para a porta, servindo bourbon, no meio de uma frase para o Stefan sobre como "um original não vai simplesmente aparecer na cidade sem avisar". Ele para quando sente o cheiro. Conhece aquele perfume há cento e cinquenta anos.
+
+Damon se vira devagar. O copo fica no ar.
+
+— Não. — Ele ri, sem humor nenhum. — Não pode ser. Stefan, diz que eu bebi demais.
+
+Stefan aparece na porta da biblioteca com um livro ainda aberto na mão. Ele não diz nada por um segundo. Os olhos dele vão direto para o anel com o brasão da família.
+
+— Gabrielle — Stefan diz, baixo, como quem confere se é real.
+
+Damon apoia o copo na lareira e cruza os braços.
+
+— Décadas. Nem um cartão de Natal. E você escolhe logo esta semana pra voltar? — Os olhos dele se estreitam. — O que você sabe que a gente não sabe?`;
+
+/* ============================================================
+   Estado
+   ============================================================ */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const MIN = 60000;
+
+function newGame(keep){
+  const now = Date.now();
+  return {
+    v:1, created:now, savedAt:0,
+    ficha: keep?.ficha ? {...keep.ficha} : {...DEFAULT_FICHA},
+    rules: keep?.rules ?? DEFAULT_RULES,
+    memory: DEFAULT_MEMORY, memoryTurn:0,
+    turn:0, lastEventTurn:0,
+    story:[{id:uid(),role:"narr",text:PROLOGUE,turn:0,t:now}],
+    insta:{followers:312, following:9, avatar:keep?.insta?.avatar||null, posts:[], feed:[
+      {id:uid(),who:"elena",desc:"Um diário de capa de couro aberto sobre a cama, caneta em cima, a janela embaçada de neblina atrás.",caption:"Algumas noites pedem mais páginas.",likes:84,t:now-5*60*MIN,comments:[
+        {id:uid(),who:"caroline",text:"vc e esse diário 🙄❤️ me liga amanhã!!",t:now-4.8*60*MIN},
+        {id:uid(),who:"stefan",text:"Boa noite, Elena.",t:now-4.5*60*MIN}]},
+      {id:uid(),who:"caroline",desc:"Caroline sorrindo no Mystic Grill, cercada de caixas de decoração e um rolo enorme de luzinhas.",caption:"Comitê do Baile de Outono: DIA 1. Alguém aí sabe pendurar luzinhas sem drama? 🍂✨",likes:131,t:now-9*60*MIN,comments:[
+        {id:uid(),who:"matt",text:"eu levo a escada",t:now-8.7*60*MIN},
+        {id:uid(),who:"damon",text:"drama é a parte boa",t:now-8.2*60*MIN}]},
+    ]},
+    tweets:[
+      {id:uid(),who:"damon",text:"mystic falls: onde o bourbon é bom e os segredos são melhores.",t:now-40*MIN,likes:23,rts:4,replies:[
+        {id:uid(),who:"alaric",text:"o bourbon é meu, só pra constar.",t:now-35*MIN}]},
+      {id:uid(),who:"caroline",text:"Se mais uma pessoa me perguntar se eu tô \"diferente\"... SIM. Cortei a franja. 🙄",t:now-3*60*MIN,likes:41,rts:2,replies:[]},
+      {id:uid(),who:"bonnie",text:"Minha avó dizia que a lua muda as pessoas. Tô começando a achar que ela falava sério.",t:now-6*60*MIN,likes:17,rts:1,replies:[]},
+      {id:uid(),who:"matt",text:"turno dobrado no grill. alguém me lembra por que eu aceitei",t:now-8*60*MIN,likes:12,rts:0,replies:[]},
+    ],
+    dms:{}, notifs:[], queue:[],
+  };
+}
+
+let S = loadLocal() || newGame();
+let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, lastTyping:false, feedBusy:false, twBusy:false};
+
+/* ============================================================
+   Utilidades
+   ============================================================ */
+const $ = (s,r=document)=>r.querySelector(s);
+function h(tag, props, ...kids){
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(props||{})){
+    if (v==null || v===false) continue;
+    if (k==="class") el.className = v;
+    else if (k==="text") el.textContent = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k==="style") el.style.cssText = v;
+    else if (k==="html") el.innerHTML = v;
+    else if (k==="value") el.value = v;
+    else el.setAttribute(k, v===true ? "" : v);
+  }
+  for (const kid of kids.flat(Infinity)){
+    if (kid==null || kid===false) continue;
+    el.append(kid instanceof Node ? kid : String(kid));
+  }
+  return el;
+}
+function svg(path, extra=""){ const s = document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("viewBox","0 0 24 24"); s.setAttribute("fill","none"); s.setAttribute("stroke","currentColor"); s.setAttribute("stroke-width","1.7"); s.setAttribute("stroke-linecap","round"); s.setAttribute("stroke-linejoin","round"); s.innerHTML = path + extra; return s; }
+const ICON = {
+  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  reply:'<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.7-.8L3 21l1.9-5.3A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/>',
+  rt:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  phone:'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
+};
+function rel(t){
+  const d = Math.max(0, Date.now()-t), m = Math.floor(d/MIN);
+  if (m < 1) return "agora";
+  if (m < 60) return m+" min";
+  const hr = Math.floor(m/60); if (hr < 24) return hr+" h";
+  const dd = Math.floor(hr/24); return dd+" d";
+}
+function relLong(t){ const r = rel(t); return r==="agora" ? "agora mesmo" : "há "+r; }
+const clampN = (v,a,b,d)=>{ const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(b,Math.max(a,n)) : d; };
+const nf = n => Number(n||0).toLocaleString("pt-BR");
+function norm(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/^@/,"").trim(); }
+function resolveWho(raw){
+  const s = norm(raw);
+  if (!s) return "fa:mysticfalls_local";
+  if (s==="gabi" || s==="gabrielle" || s.startsWith("gabriellesalvatore")) return "gabi";
+  for (const id of CHAR_IDS){
+    const c = CHARS[id];
+    if (s===id || s===norm(c.handle) || s===norm(c.short) || s===norm(c.name) || s.startsWith(id+" ") || s.includes(norm(c.handle))) return id;
+  }
+  if (s.startsWith("fa:") || s.startsWith("fa ")) return "fa:" + s.slice(3).replace(/^@/,"").replace(/[^a-z0-9_.]/g,"").slice(0,30) || "fa:mysticfalls_local";
+  const first = s.split(/\s+/)[0];
+  for (const id of CHAR_IDS) if (first===norm(CHARS[id].short)) return id;
+  return "fa:" + s.replace(/[^a-z0-9_.]/g,"").slice(0,30);
+}
+function who(w){
+  if (w==="gabi") return {id:"gabi",name:S.ficha.nome||"Gabrielle Salvatore",short:"Gabrielle",handle:"gabriellesalvatore",me:true};
+  if (CHARS[w]) return {id:w,...CHARS[w]};
+  const hnd = String(w||"").replace(/^fa:/,"") || "anônimo";
+  return {id:w,name:hnd,short:hnd,handle:hnd,fan:true};
+}
+const nm = w => who(w).short;
+const hd = w => who(w).handle;
+function avatar(w, cls=""){
+  const p = who(w);
+  if (p.me){
+    const el = h("div",{class:"av me "+cls,"aria-hidden":"true"},"GS");
+    if (S.insta.avatar) loadPhoto(S.insta.avatar).then(u=>{ if(u){ el.textContent=""; el.append(h("img",{src:u,alt:""})); } });
+    return el;
+  }
+  if (p.fan) return h("div",{class:"av fan "+cls,"aria-hidden":"true"}, (p.handle[0]||"?").toUpperCase());
+  return h("div",{class:"av "+cls,style:`background:${p.color}`,"aria-hidden":"true"}, p.short[0]);
+}
+function fmt(text){
+  const frag = document.createDocumentFragment();
+  String(text||"").split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach(par=>{
+    const p = document.createElement("p");
+    par.split(/(\*[^*\n]+\*)/g).forEach(part=>{
+      if (/^\*[^*\n]+\*$/.test(part)) p.append(h("em",null,part.slice(1,-1)));
+      else if (part) p.append(part);
+    });
+    frag.append(p);
+  });
+  return frag;
+}
+function autosize(t){ t.style.height="auto"; t.style.height = Math.min(t.scrollHeight+2, window.innerHeight*0.4)+"px"; }
+
+/* ============================================================
+   Salvamento: local + conta (db)
+   ============================================================ */
+const LKEY = "gs:state:v1";
+function loadLocal(){ try{ const raw = localStorage.getItem(LKEY); if (!raw) return null; const s = JSON.parse(raw); return s && s.v===1 && Array.isArray(s.story) ? s : null; }catch{ return null; } }
+function saveLocal(){ try{ localStorage.setItem(LKEY, JSON.stringify(S)); }catch{} }
+let Cloud = null, saveTimer = null, saveChain = Promise.resolve(), lastChunkJSON = [];
+const CHUNK = 40;
+const coreRef = () => Cloud.db.doc(Cloud.base + "/core");
+const storyCol = () => coreRef().collection("story");
+const photoCol = () => coreRef().collection("photos");
+const chunkId = i => "c" + String(i).padStart(4,"0");
+
+function setPill(mode){
+  const p = $("#savePill");
+  p.classList.toggle("err", mode==="err");
+  p.textContent = mode==="cloud" ? "salvo na sua conta" : mode==="err" ? "erro ao salvar" : "salvo neste aparelho";
+  const sub = $("#saveSub"); sub.textContent = " · " + p.textContent; sub.classList.toggle("err", mode==="err");
+}
+function trimState(){
+  S.tweets = S.tweets.slice(-160);
+  S.insta.feed = S.insta.feed.slice(-60);
+  S.notifs = S.notifs.slice(-80);
+  for (const k of Object.keys(S.dms)) S.dms[k] = S.dms[k].slice(-160);
+}
+function markDirty(){ clearTimeout(saveTimer); saveTimer = setTimeout(persist, 1200); }
+function persist(){
+  clearTimeout(saveTimer);
+  trimState();
+  S.savedAt = Date.now();
+  saveLocal();
+  if (Cloud) saveChain = saveChain.then(pushCloud).then(()=>setPill("cloud")).catch(e=>{ console.warn("save", e); setPill("err"); });
+}
+async function pushCloud(){
+  const {story, ...core} = S;
+  const chunks = [];
+  for (let i=0; i<Math.max(1,Math.ceil(story.length/CHUNK)); i++) chunks.push(story.slice(i*CHUNK,(i+1)*CHUNK));
+  for (let i=0;i<chunks.length;i++){
+    const j = JSON.stringify(chunks[i]);
+    if (lastChunkJSON[i] !== j){ await storyCol().doc(chunkId(i)).set({msgs:chunks[i]}); lastChunkJSON[i] = j; }
+  }
+  for (let i=chunks.length;i<lastChunkJSON.length;i++){ await storyCol().doc(chunkId(i)).delete(); }
+  lastChunkJSON.length = chunks.length;
+  let body = {data:core, chunks:chunks.length, savedAt:S.savedAt};
+  if (JSON.stringify(body).length > 240000){
+    S.tweets = S.tweets.slice(-60); S.insta.feed = S.insta.feed.slice(-20); S.notifs = S.notifs.slice(-30);
+    for (const k of Object.keys(S.dms)) S.dms[k] = S.dms[k].slice(-60);
+    const {story:_s, ...c2} = S; body = {data:c2, chunks:chunks.length, savedAt:S.savedAt};
+  }
+  await coreRef().set(body);
+}
+async function initCloud(){
+  const C = window.claude;
+  if (!C?.use) return;
+  let db=null, user=null;
+  try{ [db,user] = await Promise.all([C.use("db"), C.use("user")]); }catch{}
+  if (!db || !user) return;
+  let id = null; try{ id = await user.id(); }catch{}
+  if (!id) return;
+  Cloud = {db, base:"data/users/"+id};
+  try{
+    const snap = await coreRef().get();
+    if (snap.exists){
+      const d = snap.data();
+      if (!S.savedAt || (d.savedAt||0) > S.savedAt){
+        const qs = await storyCol().get();
+        const docs = qs.docs.filter(x=>x.exists).sort((a,b)=>a.id<b.id?-1:1);
+        const story = docs.flatMap(x=>x.data().msgs||[]);
+        S = {...d.data, story: story.length ? story : newGame().story};
+        lastChunkJSON = docs.map(x=>JSON.stringify(x.data().msgs||[]));
+        saveLocal();
+        renderAll(true);
+      } else if (d.savedAt === S.savedAt){
+        const n = d.chunks||0;
+        lastChunkJSON = Array.from({length:n},(_,i)=>JSON.stringify(S.story.slice(i*CHUNK,(i+1)*CHUNK)));
+      } else {
+        lastChunkJSON = Array.from({length:d.chunks||0},()=>"?");
+        await pushCloud();
+      }
+    } else {
+      await pushCloud();
+    }
+    setPill("cloud");
+  }catch(e){ console.warn("cloud", e); Cloud = null; setPill("local"); }
+}
+
+/* Fotos */
+const photoMem = {};
+async function storePhoto(id, dataURL){
+  photoMem[id] = dataURL;
+  try{ localStorage.setItem("gs:p:"+id, dataURL); }catch{}
+  if (Cloud){ try{ await photoCol().doc(id).set({d:dataURL,t:Date.now()}); }catch(e){ console.warn("photo", e); toast({text:"A foto não foi salva na sua conta, só neste aparelho."}); } }
+}
+async function loadPhoto(id){
+  if (!id) return null;
+  if (photoMem[id]) return photoMem[id];
+  try{ const v = localStorage.getItem("gs:p:"+id); if (v){ photoMem[id]=v; return v; } }catch{}
+  if (Cloud){ try{ const s = await photoCol().doc(id).get(); if (s.exists){ photoMem[id] = s.data().d; return photoMem[id]; } }catch{} }
+  return null;
+}
+async function dropPhoto(id){ delete photoMem[id]; try{ localStorage.removeItem("gs:p:"+id); }catch{} if (Cloud){ try{ await photoCol().doc(id).delete(); }catch{} } }
+function compressImage(file, max=760, q=0.8){
+  return new Promise((res,rej)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      const sc = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth*sc); c.height = Math.round(img.naturalHeight*sc);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(blob=>{
+        if (!blob) return rej(new Error("blob"));
+        const fr = new FileReader(); fr.onload = ()=>res({blob, dataURL:fr.result}); fr.onerror = rej; fr.readAsDataURL(blob);
+      }, "image/jpeg", q);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.src = url;
+  });
+}
+
+/* ============================================================
+   IA (capacidade "sample" do Claude)
+   ============================================================ */
+let AI = null, canImages = false;
+const aiReady = (window.claude?.use ? window.claude.use("sample") : Promise.resolve(null))
+  .then(s=>{ AI = s; if (!s) $("#aiBanner").hidden = false; else s.limits?.().then(l=>{ canImages = !!l?.images; }).catch(()=>{}); return s; })
+  .catch(()=>{ $("#aiBanner").hidden = false; return null; });
+function errMsg(e){
+  switch (e?.code){
+    case "no_ai": return "A IA só funciona com a página aberta no Claude.";
+    case "not_granted": return "A IA não foi liberada para esta página. Libere no menu de permissões do artifact e tente de novo.";
+    case "rate_limited": return "Limite de uso do Claude atingido por agora. Tente de novo em alguns minutos.";
+    case "refused": return "O Claude recusou esse trecho. Reescreva o turno de outro jeito.";
+    case "session_expired": return "Sua sessão no Claude expirou. Entre de novo e tente outra vez.";
+    case "invalid_json": return "A resposta veio num formato estranho. Tente de novo.";
+    case "image_rejected": return "Essa imagem não foi aceita. Tente outra foto (JPG ou PNG).";
+    case "prompt_too_large": return "A história ficou grande demais para uma chamada. Atualize a memória na Ficha e tente de novo.";
+    case "cancelled": return "";
+    default: return "A resposta falhou no meio do caminho. Tente de novo.";
+  }
+}
+async function needAI(){ await aiReady; if (!AI) throw {code:"no_ai"}; return AI; }
+async function askJSON(prompt, opts={}){ const ai = await needAI(); return ai.json(prompt, {modelTier:"default", cache:false, ...opts}); }
+async function askText(prompt, opts={}){ const ai = await needAI(); const r = await ai(prompt, {modelTier:"default", cache:false, ...opts}); return r.text; }
+
+/* Contextos compartilhados pelos prompts */
+function fichaText(){
+  const f = S.ficha;
+  return FICHA_FIELDS.filter(([k])=>k!=="bio").map(([k,l])=>`${l}: ${f[k]||""}`).join("\n");
+}
+function castText(){
+  return CHAR_IDS.map(id=>{ const c = CHARS[id]; return `- ${id} (${c.name}, @${c.handle}): ${c.voice} Redes: ${c.redes}`; }).join("\n");
+}
+function storyLine(m){ return m.role==="gabi" ? `GABI (narrando a Gabrielle): ${m.text}` : `NARRADOR: ${m.text}`; }
+function recentStory(n){ return S.story.filter(m=>m.role!=="sys").slice(-n).map(storyLine).join("\n\n"); }
+function socialContext({dms=true, only=null}={}){
+  const L = [];
+  const posts = S.insta.posts.slice(-4);
+  L.push(`Instagram da Gabrielle (@gabriellesalvatore, ${nf(S.insta.followers)} seguidores, bio: "${S.ficha.bio||""}"):`);
+  if (!posts.length) L.push("- nenhum post ainda");
+  posts.forEach(p=>{
+    L.push(`- post ${relLong(p.t)}: "${p.caption}"${p.desc?` (a foto mostra: ${p.desc})`:""}, ${nf(p.likes)} curtidas`);
+    p.comments.slice(-6).forEach(c=>L.push(`   · ${hd(c.who)}: ${c.text}`));
+  });
+  const feed = S.insta.feed.slice().sort((a,b)=>a.t-b.t).slice(-4);
+  if (feed.length){ L.push("Posts recentes de outros no Insta:"); feed.forEach(p=>{ L.push(`- ${nm(p.who)} ${relLong(p.t)}: "${p.caption}" (foto: ${p.desc})`); p.comments.slice(-3).forEach(c=>L.push(`   · ${hd(c.who)}: ${c.text}`)); }); }
+  const tws = S.tweets.slice().sort((a,b)=>a.t-b.t).slice(-8);
+  if (tws.length){ L.push("Twitter (mais recentes por último):"); tws.forEach(t=>{ L.push(`- @${hd(t.who)} ${relLong(t.t)}: ${t.text}`); t.replies.slice(-3).forEach(r=>L.push(`   ↳ @${hd(r.who)}: ${r.text}`)); }); }
+  if (dms){
+    const threads = Object.entries(S.dms).filter(([w,a])=>a.length && (!only || w===only)).sort((a,b)=>b[1].at(-1).t-a[1].at(-1).t).slice(0,4);
+    if (threads.length){
+      L.push("DMs (PRIVADAS: só a Gabrielle e a outra pessoa sabem):");
+      threads.forEach(([w,a])=>{ L.push(`- conversa com ${nm(w)}:`); a.slice(-5).forEach(m=>L.push(`   ${m.from==="gabi"?"Gabrielle":nm(w)}: ${m.text}`)); });
+    }
+  }
+  const un = S.notifs.filter(n=>!n.read).slice(-8);
+  if (un.length && !only){ L.push("Notificações que a Gabrielle AINDA NÃO VIU no celular:"); un.forEach(n=>L.push(`- ${n.text}`)); }
+  return L.join("\n");
+}
+function worldBrief(){
+  return `UNIVERSO: The Vampire Diaries. Mystic Falls, outono de 2010 (época da 2ª temporada). O Klaus está na cidade atrás da Elena, mas ainda não se revelou para todos.
+
+A PROTAGONISTA, interpretada pela Gabi (você nunca decide nada por ela):
+${fichaText()}
+
+MEMÓRIA DA HISTÓRIA ATÉ AGORA:
+${S.memory}
+
+CENA MAIS RECENTE:
+${recentStory(6)}`;
+}
+const WHO_IDS_LINE = `Use em "quem" um destes ids: ${CHAR_IDS.join(", ")}; ou "fa:@usuario_inventado" para perfis aleatórios da cidade.`;
+
+/* ============================================================
+   Notificações, fila de acontecimentos
+   ============================================================ */
+function addNotif(n){
+  const item = {id:uid(), read:false, t:Date.now(), ...n};
+  if (isViewing(item)) item.read = true;
+  S.notifs.push(item);
+  if (!item.read) toast(item);
+  return item;
+}
+function isViewing(n){
+  if (document.hidden) return false;
+  if (n.tab==="dms") return UI.tab==="dms" && UI.thread===n.who;
+  return UI.tab===n.tab;
+}
+function schedule(item, delayMs){ S.queue.push({id:uid(), at:Date.now()+delayMs, ...item}); }
+function findPost(id){ return S.insta.posts.find(p=>p.id===id) || S.insta.feed.find(p=>p.id===id); }
+function findTweet(id){ return S.tweets.find(t=>t.id===id); }
+function addDM(w, text, extra={}){
+  (S.dms[w] ||= []).push({id:uid(), from:w, text, t:Date.now(), ...extra});
+  addNotif({kind:"dm", who:w, tab:"dms", text:`${nm(w)}: ${text}`, turn:extra.turn});
+}
+function applyQueued(q){
+  if (q.type==="comment"){
+    const p = findPost(q.postId); if (!p) return;
+    p.comments.push({id:uid(), who:q.who, text:q.text, t:Date.now(), turn:q.turn});
+    const mine = S.insta.posts.includes(p);
+    if (mine || /@gabriellesalvatore/i.test(q.text)) addNotif({kind:"comment", who:q.who, tab:"insta", ref:p.id, text:`${hd(q.who)} ${mine?"comentou sua foto":"te respondeu"}: ${q.text}`, turn:q.turn});
+  } else if (q.type==="likes"){
+    const p = q.tweet ? findTweet(q.postId) : findPost(q.postId); if (!p) return;
+    p.likes = (p.likes||0) + q.n; if (q.rts) p.rts = (p.rts||0) + q.rts;
+  } else if (q.type==="follow"){
+    S.insta.followers += q.n;
+    addNotif({kind:"follow", who:"fa:novos", tab:"insta", text:`+${nf(q.n)} novos seguidores no Insta`});
+  } else if (q.type==="dm"){
+    addDM(q.who, q.text, {turn:q.turn});
+  } else if (q.type==="tweetReply"){
+    const t = findTweet(q.tweetId); if (!t) return;
+    t.replies.push({id:uid(), who:q.who, text:q.text, t:Date.now(), turn:q.turn});
+    if (t.who==="gabi" || /@gabriellesalvatore/i.test(q.text)) addNotif({kind:"reply", who:q.who, tab:"twitter", ref:t.id, text:`@${hd(q.who)} respondeu: ${q.text}`, turn:q.turn});
+  }
+}
+function tick(){
+  const now = Date.now(); let changed = false;
+  const due = S.queue.filter(q=>q.at<=now);
+  if (due.length){
+    S.queue = S.queue.filter(q=>q.at>now);
+    due.sort((a,b)=>a.at-b.at).forEach(q=>{ try{ applyQueued(q); }catch(e){ console.warn(e); } });
+    changed = true;
+  }
+  if (changed){ markDirty(); renderAll(); }
+  else if (UI.tab==="dms" && CHARS[UI.thread] && threadTyping(UI.thread) !== UI.lastTyping) renderDMs();
+}
+
+/* ============================================================
+   História: narrador
+   ============================================================ */
+function narratorPrompt(){
+  return `Você é o NARRADOR de um RPG de texto no universo de The Vampire Diaries. A jogadora, Gabi, interpreta a própria personagem, Gabrielle Salvatore. Todos os outros personagens e o mundo são seus.
+
+REGRAS DA GABI (inegociáveis):
+${S.rules}
+
+COMO ESCREVER:
+- Português do Brasil, com a qualidade de um episódio de TVD: concreto, sensorial, com subtexto e tensão. Diálogos com travessão (—).
+- Cada personagem com a voz da série: Damon ácido e engraçado na pior hora; Stefan contido e perceptivo; Klaus elegante, perigosamente calmo, possessivo com ela; Elena calorosa e firme; Caroline acelerada; Bonnie desconfiada; Katherine venenosa e divertida.
+- 3 a 6 parágrafos curtos (mais ou menos 150 a 350 palavras). Termine num ponto em que a Gabrielle possa reagir: uma fala, um gesto ou um silêncio dirigido a ela.
+- NUNCA escreva o que a Gabrielle diz, faz, pensa, sente ou decide, nem reações do corpo dela. Você pode descrever o que os outros fazem com ela e o que o mundo mostra a ela.
+- Se o turno da Gabi for curto ou ambíguo, siga a intenção mais natural sem inventar ações da Gabrielle.
+- Ritmo devagar. Um mistério por vez. Não resolva tudo nem empilhe reviravoltas.
+- Sem títulos, sem listas de opções, sem perguntas do tipo "o que você faz?", sem comentários fora da história.
+
+AS REDES SOCIAIS FAZEM PARTE DA HISTÓRIA:
+- Você recebe o estado do Instagram, do Twitter e das DMs, e as notificações que a Gabrielle ainda não viu.
+- Personagens na cena podem comentar posts e tweets PÚBLICOS que viram. DMs são privadas: só a Gabrielle e quem mandou conhecem o conteúdo.
+- Se houver notificação não vista, você pode mostrar o celular vibrando ou a tela acendendo, sem revelar o conteúdo. Se a Gabi disser que a Gabrielle olha o celular, use o conteúdo real das notificações.
+- Raramente, e só quando tiver peso dramático, um personagem que NÃO está na cena pode mandar uma DM ou tuitar. Para isso, acrescente no final, em linha separada, exatamente um destes formatos:
+@@DM|id do personagem|texto da mensagem
+@@TWEET|id do personagem|texto do tweet
+Ids: ${CHAR_IDS.join(", ")}. Essas linhas não aparecem como texto; viram notificações reais. Se usar, mostre na narração só o celular vibrando.
+
+FICHA DA GABRIELLE:
+${fichaText()}
+
+MEMÓRIA DO MUNDO (resumo do que já aconteceu):
+${S.memory}
+
+A seguir, as últimas mensagens da história.`;
+}
+function buildNarratorInput(turn){
+  const gabiMsg = S.story.find(m=>m.role==="gabi" && m.turn===turn);
+  const hist = S.story.filter(m=>m.role!=="sys" && m.turn<turn).slice(-23);
+  const msgs = [{role:"user", content:narratorPrompt()}];
+  hist.forEach(m=>msgs.push({role: m.role==="gabi" ? "user" : "assistant", content:m.text}));
+  msgs.push({role:"user", content:`[ESTADO DAS REDES AGORA]\n${socialContext()}\n\n[TURNO DA GABI, narrando a Gabrielle]\n${gabiMsg.text}\n\n[Escreva a próxima resposta do narrador.]`});
+  return msgs;
+}
+function visibleNarr(text){ return text.replace(/(^|\n)@@[\s\S]*$/,"").trim(); }
+let narrCtl = null;
+async function runNarrator(turn){
+  UI.storyErr = null;
+  UI.streaming = {turn, text:""};
+  renderStory(true); renderComposer();
+  narrCtl = new AbortController();
+  try{
+    const ai = await needAI();
+    const r = await ai(buildNarratorInput(turn), {
+      modelTier:"complex", cache:false, signal:narrCtl.signal,
+      onText:({text})=>{ if (UI.streaming){ UI.streaming.text = text; updateStream(); } },
+    });
+    if (S.turn < turn || !S.story.some(m=>m.turn===turn && m.role==="gabi")){ UI.streaming = null; renderStory(); return; }
+    const raw = r.text;
+    const clean = visibleNarr(raw);
+    S.story.push({id:uid(), role:"narr", text:clean || "…", turn, t:Date.now()});
+    UI.streaming = null;
+    handleTags(raw, turn);
+    const g = S.story.find(m=>m.role==="gabi" && m.turn===turn);
+    if (g && /celular|telefone|mensage|notifica|\bdm\b|tela|insta|twitter/i.test(g.text)) S.notifs.forEach(n=>n.read = true);
+    markDirty(); renderAll(true);
+    afterTurn(turn);
+  }catch(e){
+    UI.streaming = null;
+    if (e?.code !== "cancelled") UI.storyErr = {turn, msg:errMsg(e)};
+    else UI.storyErr = {turn, msg:"Resposta interrompida."};
+    renderStory(true); renderComposer();
+  }finally{ narrCtl = null; renderComposer(); }
+}
+function handleTags(raw, turn){
+  const lines = raw.split("\n").filter(l=>l.trim().startsWith("@@"));
+  for (const line of lines.slice(0,2)){
+    const parts = line.trim().slice(2).split("|");
+    const kind = (parts[0]||"").toUpperCase().trim();
+    const w = resolveWho(parts[1]); const text = parts.slice(2).join("|").trim();
+    if (!text || !CHARS[w]) continue;
+    if (kind==="DM") scheduleStoryEvent({tipo:"dm", quem:w, texto:text}, turn, 4000);
+    else if (kind==="TWEET") scheduleStoryEvent({tipo:"tweet", quem:w, texto:text}, turn, 4000);
+    S.lastEventTurn = turn;
+  }
+}
+function scheduleStoryEvent(ev, turn, delay=0){
+  const w = resolveWho(ev.quem); if (!CHARS[w]) return;
+  const apply = ()=>{
+    if (S.turn < turn) return;
+    if (ev.tipo==="dm"){
+      const text = String(ev.texto||"").trim(); if (!text) return;
+      addDM(w, text, {turn});
+      S.story.push({id:uid(), role:"sys", kind:"dm", who:w, text:`Nova DM de ${nm(w)}`, turn, t:Date.now()});
+    } else if (ev.tipo==="tweet"){
+      const text = String(ev.texto||"").trim(); if (!text) return;
+      const tw = {id:uid(), who:w, text, t:Date.now(), likes:clampN(Math.random()*20,0,40,3), rts:0, replies:[], turn};
+      S.tweets.push(tw);
+      addNotif({kind:"tweet", who:w, tab:"twitter", ref:tw.id, text:`@${hd(w)} tuitou: ${text}`, turn});
+      S.story.push({id:uid(), role:"sys", kind:"tweet", who:w, ref:tw.id, text:`${nm(w)} tuitou`, turn, t:Date.now()});
+    } else if (ev.tipo==="insta"){
+      const p = {id:uid(), who:w, desc:String(ev.descricao||"").trim(), caption:String(ev.legenda||"").trim(), likes:clampN(ev.curtidas,3,5000,40), t:Date.now(), comments:[], turn};
+      if (!p.desc && !p.caption) return;
+      (ev.comentarios||[]).slice(0,4).forEach((c,i)=>{ const t = String(c.texto||"").trim(); if (t) p.comments.push({id:uid(), who:resolveWho(c.quem), text:t, t:Date.now()+i, turn}); });
+      S.insta.feed.push(p);
+      addNotif({kind:"insta", who:w, tab:"insta", ref:p.id, text:`${nm(w)} postou uma foto: ${p.caption}`, turn});
+      S.story.push({id:uid(), role:"sys", kind:"insta", who:w, ref:p.id, text:`${nm(w)} postou no Insta`, turn, t:Date.now()});
+    }
+    markDirty(); renderAll(true);
+  };
+  if (delay) setTimeout(apply, delay); else apply();
+}
+async function afterTurn(turn){
+  const gap = turn - (S.lastEventTurn||0);
+  if (turn >= 2 && (gap >= 6 || (gap >= 3 && Math.random() < 0.5))) runDirector(turn);
+  if (turn - (S.memoryTurn||0) >= 5) updateMemory();
+}
+async function runDirector(turn){
+  try{
+    const res = await askJSON(`Você coordena as redes sociais de um RPG de texto de The Vampire Diaries. Os personagens vivem a história e às vezes mexem no celular.
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+REDES AGORA:
+${socialContext()}
+
+Decida se, neste ponto da história, algum personagem que NÃO está na cena com a Gabrielle mandaria uma DM para ela ou postaria algo. Na maioria das vezes, algo pequeno e cotidiano, coerente com o que esse personagem sabe e sente. As redes dão textura e às vezes uma pista pequena; nada de resolver mistérios ou criar reviravoltas. O Klaus aparece raramente, e sempre com intenção. Quem está na cena com ela não manda DM. Pode ser que nada aconteça.
+
+Responda só com JSON: {"eventos":[...]} com 0 a 2 eventos, nestes formatos:
+{"tipo":"dm","quem":"elena","texto":"..."}
+{"tipo":"tweet","quem":"caroline","texto":"..."}
+{"tipo":"insta","quem":"stefan","descricao":"o que a foto mostra","legenda":"...","curtidas":60,"comentarios":[{"quem":"damon","texto":"..."}]}
+Use em "quem" um destes ids: ${CHAR_IDS.join(", ")}.`);
+    if (S.turn !== turn) return;
+    const evs = Array.isArray(res?.eventos) ? res.eventos.slice(0,2) : [];
+    if (!evs.length) return;
+    S.lastEventTurn = turn;
+    evs.forEach((ev,i)=>scheduleStoryEvent(ev, turn, 2500 + i*9000));
+    markDirty();
+  }catch(e){ console.warn("director", e); }
+}
+async function updateMemory(manual=false){
+  if (UI.memBusy) return;
+  UI.memBusy = true; renderFicha();
+  try{
+    const text = await askText(`Você mantém a memória de um RPG de texto de The Vampire Diaries cuja protagonista é a Gabrielle Salvatore (interpretada pela Gabi).
+
+MEMÓRIA ATUAL:
+${S.memory}
+
+TRECHOS RECENTES DA HISTÓRIA:
+${recentStory(20)}
+
+REDES:
+${socialContext()}
+
+Reescreva a memória em português, com no máximo 230 palavras, em linhas curtas começando por estes rótulos: "Onde e quando:", "O que aconteceu:", "Fio atual:" (um só mistério ou trama), "Relações:", "Nas redes:". Guarde os fatos antigos que ainda importam e corte o que não importa mais. Não invente nada que não esteja nos trechos. Responda só com o texto da memória.`, {modelTier:"default"});
+    S.memory = text.trim(); S.memoryTurn = S.turn;
+    markDirty();
+    if (manual) toast({text:"Memória do mundo atualizada."});
+  }catch(e){ if (manual) toast({text:errMsg(e)}); }
+  finally{ UI.memBusy = false; renderFicha(); }
+}
+async function sendStory(){
+  const ta = $("#storyInput");
+  const text = ta.value.trim();
+  if (!text || UI.streaming) return;
+  await aiReady;
+  if (!AI){ toast({text:errMsg({code:"no_ai"})}); return; }
+  S.turn += 1;
+  S.story.push({id:uid(), role:"gabi", text, turn:S.turn, t:Date.now()});
+  ta.value = ""; autosize(ta);
+  try{ sessionStorage.removeItem("gs:draft"); }catch{}
+  markDirty();
+  runNarrator(S.turn);
+}
+function removeTurnContent(turn, keepGabi){
+  S.story = S.story.filter(m=>!(m.turn===turn && (m.role!=="gabi" || !keepGabi)) && m.turn<=turn);
+  S.queue = S.queue.filter(q=>!(q.turn>=turn));
+  S.notifs = S.notifs.filter(n=>!(n.turn>=turn));
+  S.tweets = S.tweets.filter(t=>!(t.turn>=turn));
+  S.insta.feed = S.insta.feed.filter(p=>!(p.turn>=turn));
+  for (const k of Object.keys(S.dms)){ S.dms[k] = S.dms[k].filter(m=>!(m.turn>=turn)); if (!S.dms[k].length) delete S.dms[k]; }
+  S.lastEventTurn = Math.min(S.lastEventTurn||0, turn-1);
+}
+function redoReply(){
+  if (UI.streaming) return;
+  const last = lastTurn(); if (!last) return;
+  removeTurnContent(last, true);
+  UI.storyErr = null;
+  markDirty(); renderAll(true);
+  runNarrator(last);
+}
+function undoTurn(){
+  if (UI.streaming) narrCtl?.abort();
+  const last = lastTurn(); if (!last) return;
+  const g = S.story.find(m=>m.role==="gabi" && m.turn===last);
+  removeTurnContent(last, false);
+  S.story = S.story.filter(m=>m.turn<last);
+  S.turn = last-1;
+  UI.storyErr = null; UI.streaming = null;
+  const ta = $("#storyInput"); if (g){ ta.value = g.text; autosize(ta); }
+  markDirty(); renderAll(true);
+}
+function lastTurn(){ const g = S.story.filter(m=>m.role==="gabi"); return g.length ? g.at(-1).turn : 0; }
+
+/* ============================================================
+   Insta
+   ============================================================ */
+async function fitPhoto(file){
+  let img = await compressImage(file, 760, 0.8);
+  if (img.dataURL.length > 230000) img = await compressImage(file, 640, 0.7);
+  if (img.dataURL.length > 230000) img = await compressImage(file, 520, 0.6);
+  return img;
+}
+async function postPhoto(){
+  const np = UI.newPost; if (!np?.file) return;
+  const caption = ($("#npCaption")?.value||"").trim();
+  np.busy = true; renderInsta();
+  let img;
+  try{ img = await fitPhoto(np.file); }catch{ np.busy=false; toast({text:"Não deu para abrir essa imagem. Tente outra foto."}); renderInsta(); return; }
+  const id = uid();
+  await storePhoto(id, img.dataURL);
+  const post = {id, photo:id, caption, desc:"", likes:0, t:Date.now(), comments:[], status:"analyzing"};
+  S.insta.posts.push(post);
+  UI.newPost = null; UI.instaSeg = "perfil";
+  markDirty(); renderInsta();
+  try{
+    const opts = {};
+    if (canImages) opts.images = [img.blob];
+    const res = await askJSON(`A Gabrielle Salvatore (personagem interpretada pela Gabi) acabou de postar uma foto no Instagram (@gabriellesalvatore, ${nf(S.insta.followers)} seguidores).
+Legenda: "${caption || "(sem legenda)"}"
+${canImages ? "A imagem anexada é a foto postada." : "Não foi possível ver a imagem; imagine uma foto coerente com a legenda e com a Gabrielle."}
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+REDES AGORA:
+${socialContext({dms:false})}
+
+Tarefa: descreva em uma frase o que a foto mostra (para os personagens lembrarem depois) e escreva as reações.
+- 3 a 7 comentários de personagens, cada um com a própria voz, coerente com o que sabe e com a relação com a Gabrielle; mais 1 a 3 comentários de perfis aleatórios da cidade.
+- Personagens podem responder uns aos outros no post (o Damon implicando com alguém, por exemplo). Para isso use "respondeA" com o índice do comentário respondido.
+- O Klaus quase nunca comenta em público. Se ele reagir, prefira uma DM curta e carregada.
+- "segundos": quando o comentário chega, de 8 a 240, em ordem crescente.
+- "dm": opcional; uma DM que alguém manda por causa da foto, ou null.
+${WHO_IDS_LINE}
+Responda só com JSON:
+{"descricao":"...","curtidas":120,"novosSeguidores":15,"comentarios":[{"quem":"damon","texto":"...","segundos":15,"respondeA":null}],"dm":{"quem":"klaus","texto":"...","segundos":150}}`, opts);
+    post.desc = String(res?.descricao||"").trim();
+    post.status = "ok";
+    const target = clampN(res?.curtidas, 5, 200000, 80);
+    [0.25,0.25,0.2,0.15,0.15].forEach((f,i)=>schedule({type:"likes", postId:id, n:Math.max(1,Math.round(target*f))}, 4000 + i*45000));
+    const cs = Array.isArray(res?.comentarios) ? res.comentarios.slice(0,10) : [];
+    cs.forEach(c=>{
+      let text = String(c?.texto||"").trim(); if (!text) return;
+      const w = resolveWho(c.quem);
+      if (Number.isInteger(c.respondeA) && cs[c.respondeA] && c.respondeA !== cs.indexOf(c)){
+        const tw = resolveWho(cs[c.respondeA].quem);
+        if (!text.startsWith("@")) text = "@"+hd(tw)+" "+text;
+      }
+      schedule({type:"comment", postId:id, who:w, text}, clampN(c.segundos,5,300,30)*1000);
+    });
+    const nfol = clampN(res?.novosSeguidores, 0, 50000, 0);
+    if (nfol) schedule({type:"follow", n:nfol}, 90000);
+    if (res?.dm && res.dm.texto){ const w = resolveWho(res.dm.quem); if (CHARS[w]) schedule({type:"dm", who:w, text:String(res.dm.texto).trim()}, clampN(res.dm.segundos,20,400,150)*1000); }
+  }catch(e){
+    post.status = "noai";
+    const m = errMsg(e); if (m) toast({text:m});
+  }
+  markDirty(); renderInsta();
+}
+async function commentOn(postId, text, replyTo){
+  const p = findPost(postId); if (!p || !text.trim()) return;
+  const mine = S.insta.posts.includes(p);
+  let body = text.trim();
+  if (replyTo && replyTo!=="gabi" && !body.startsWith("@")) body = "@"+hd(replyTo)+" "+body;
+  p.comments.push({id:uid(), who:"gabi", text:body, t:Date.now()});
+  markDirty(); renderInsta(); renderSheet();
+  try{
+    const target = replyTo || (mine ? null : p.who);
+    const res = await askJSON(`No Instagram, a Gabrielle Salvatore comentou ${mine ? "no próprio post" : `no post de ${nm(p.who)}`}.
+Post: "${p.caption}"${p.desc?` (foto: ${p.desc})`:""} por @${hd(mine?"gabi":p.who)}.
+Comentários até agora:
+${p.comments.slice(-12).map(c=>`@${hd(c.who)}: ${c.text}`).join("\n")}
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+${target ? `Ela se dirigiu a @${hd(target)}.` : ""} Quem responderia a ela, e o quê? Normalmente 1 resposta, às vezes 0 ou 2. Cada um com a própria voz. O Klaus quase nunca responde em público.
+${WHO_IDS_LINE}
+Responda só com JSON: {"respostas":[{"quem":"damon","texto":"...","segundos":20}]}`, {modelTier:"quick"});
+    (Array.isArray(res?.respostas)?res.respostas:[]).slice(0,2).forEach(r=>{
+      const t = String(r?.texto||"").trim(); if (!t) return;
+      const w = resolveWho(r.quem);
+      schedule({type:"comment", postId, who:w, text: t.startsWith("@") ? t : "@gabriellesalvatore "+t}, clampN(r.segundos,6,180,25)*1000);
+    });
+    markDirty();
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+}
+async function refreshFeed(){
+  if (UI.feedBusy) return;
+  UI.feedBusy = true; renderInsta();
+  try{
+    const res = await askJSON(`Gere posts novos no Instagram dos personagens de um RPG de The Vampire Diaries, coerentes com o momento da história.
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+REDES AGORA:
+${socialContext({dms:false})}
+
+Escreva 1 a 3 posts de personagens diferentes (quem costuma postar). Cada post tem uma foto descrita em uma frase, legenda na voz do personagem e 1 a 4 comentários de outros (podem incluir perfis aleatórios da cidade). Cotidiano, com subtexto às vezes; nada de revelar mistérios. O Klaus quase nunca posta; se postar, é arte ou um lugar, nunca rosto.
+${WHO_IDS_LINE}
+Responda só com JSON: {"posts":[{"quem":"caroline","descricao":"o que a foto mostra","legenda":"...","curtidas":90,"minutosAtras":12,"comentarios":[{"quem":"elena","texto":"..."}]}]}`);
+    const posts = Array.isArray(res?.posts) ? res.posts.slice(0,3) : [];
+    posts.forEach(pp=>{
+      const w = resolveWho(pp.quem); if (w==="gabi") return;
+      const t = Date.now() - clampN(pp.minutosAtras,0,600,10)*MIN;
+      const p = {id:uid(), who:w, desc:String(pp.descricao||"").trim(), caption:String(pp.legenda||"").trim(), likes:clampN(pp.curtidas,1,50000,40), t, comments:[]};
+      (Array.isArray(pp.comentarios)?pp.comentarios:[]).slice(0,4).forEach((c,i)=>{ const tx = String(c?.texto||"").trim(); if (tx) p.comments.push({id:uid(), who:resolveWho(c.quem), text:tx, t:t+(i+1)*MIN}); });
+      S.insta.feed.push(p);
+    });
+    if (!posts.length) toast({text:"Ninguém postou nada novo agora."});
+    markDirty();
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+  finally{ UI.feedBusy = false; renderInsta(); }
+}
+
+/* ============================================================
+   Twitter
+   ============================================================ */
+async function sendTweet(){
+  const ta = $("#twInput"); const text = ta.value.trim(); if (!text) return;
+  const tw = {id:uid(), who:"gabi", text, t:Date.now(), likes:0, rts:0, replies:[]};
+  S.tweets.push(tw); ta.value = ""; UI.openTweet = tw.id;
+  markDirty(); renderTwitter();
+  try{
+    const res = await askJSON(`A Gabrielle Salvatore acabou de tuitar (@gabriellesalvatore): "${text}"
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+REDES AGORA:
+${socialContext({dms:false})}
+
+Quem responderia, e o quê? 1 a 4 respostas, cada um com a própria voz e coerente com o que sabe (pode incluir perfis aleatórios da cidade). O Klaus quase nunca responde em público. "segundos" de 8 a 200, em ordem crescente.
+${WHO_IDS_LINE}
+Responda só com JSON: {"curtidas":30,"rts":3,"respostas":[{"quem":"damon","texto":"...","segundos":15}]}`, {modelTier:"default"});
+    const L = clampN(res?.curtidas,0,100000,10), R = clampN(res?.rts,0,20000,1);
+    [0.4,0.35,0.25].forEach((f,i)=>schedule({type:"likes", tweet:true, postId:tw.id, n:Math.round(L*f), rts:Math.round(R*f)}, 5000+i*40000));
+    (Array.isArray(res?.respostas)?res.respostas:[]).slice(0,5).forEach(r=>{
+      const t = String(r?.texto||"").trim(); if (!t) return;
+      schedule({type:"tweetReply", tweetId:tw.id, who:resolveWho(r.quem), text:t}, clampN(r.segundos,5,240,30)*1000);
+    });
+    markDirty();
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+}
+async function replyTweet(id, text){
+  const tw = findTweet(id); if (!tw || !text.trim()) return;
+  tw.replies.push({id:uid(), who:"gabi", text:text.trim(), t:Date.now()});
+  markDirty(); renderTwitter();
+  try{
+    const res = await askJSON(`No Twitter, a Gabrielle Salvatore respondeu a um tweet.
+Tweet original de @${hd(tw.who)}: "${tw.text}"
+Respostas até agora:
+${tw.replies.slice(-10).map(r=>`@${hd(r.who)}: ${r.text}`).join("\n")}
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+Quem responderia a ela? Normalmente quem tuitou (se não for a própria Gabrielle), às vezes outra pessoa; 0 a 2 respostas, cada um com a própria voz.
+${WHO_IDS_LINE}
+Responda só com JSON: {"respostas":[{"quem":"damon","texto":"...","segundos":20}]}`, {modelTier:"quick"});
+    (Array.isArray(res?.respostas)?res.respostas:[]).slice(0,2).forEach(r=>{
+      const t = String(r?.texto||"").trim(); if (!t) return;
+      const w = resolveWho(r.quem); if (w==="gabi") return;
+      schedule({type:"tweetReply", tweetId:id, who:w, text: /@gabriellesalvatore/i.test(t) ? t : "@gabriellesalvatore "+t}, clampN(r.segundos,5,180,20)*1000);
+    });
+    markDirty();
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+}
+async function refreshTweets(){
+  if (UI.twBusy) return;
+  UI.twBusy = true; renderTwitter();
+  try{
+    const res = await askJSON(`Gere tweets novos dos personagens de um RPG de The Vampire Diaries, coerentes com o momento da história.
+
+${worldBrief()}
+
+ELENCO:
+${castText()}
+
+REDES AGORA:
+${socialContext({dms:false})}
+
+Escreva 2 a 4 tweets de personagens diferentes (e no máximo 1 de perfil aleatório da cidade), cada um com a própria voz: cotidiano, indiretas, piadas, às vezes um subtexto. Nada de revelar segredos sobrenaturais em público. Cada tweet pode ter 0 a 2 respostas de outros.
+${WHO_IDS_LINE}
+Responda só com JSON: {"tweets":[{"quem":"caroline","texto":"...","minutosAtras":5,"curtidas":20,"respostas":[{"quem":"matt","texto":"..."}]}]}`);
+    const list = Array.isArray(res?.tweets) ? res.tweets.slice(0,4) : [];
+    list.forEach(x=>{
+      const w = resolveWho(x.quem); const text = String(x?.texto||"").trim(); if (!text || w==="gabi") return;
+      const t = Date.now() - clampN(x.minutosAtras,0,300,5)*MIN;
+      const tw = {id:uid(), who:w, text, t, likes:clampN(x.curtidas,0,20000,8), rts:clampN((x.curtidas||8)/8,0,3000,1), replies:[]};
+      (Array.isArray(x.respostas)?x.respostas:[]).slice(0,2).forEach((r,i)=>{ const rt = String(r?.texto||"").trim(); if (rt) tw.replies.push({id:uid(), who:resolveWho(r.quem), text:rt, t:t+(i+1)*MIN}); });
+      S.tweets.push(tw);
+    });
+    if (!list.length) toast({text:"Ninguém tuitou nada novo agora."});
+    markDirty();
+  }catch(e){ const m = errMsg(e); if (m) toast({text:m}); }
+  finally{ UI.twBusy = false; renderTwitter(); }
+}
+
+/* ============================================================
+   DMs
+   ============================================================ */
+async function sendDM(w){
+  const ta = $("#dmInput"); const text = ta.value.trim(); if (!text) return;
+  (S.dms[w] ||= []).push({id:uid(), from:"gabi", text, t:Date.now()});
+  ta.value = ""; autosize(ta);
+  markDirty(); renderDMs(true);
+  generateDM(w);
+}
+async function generateDM(w){
+  if (UI.dmPending[w]){ UI.dmAgain[w] = true; return; }
+  UI.dmPending[w] = true; renderDMs();
+  let wait = 0;
+  try{
+    await new Promise(r=>setTimeout(r, 900));
+    const c = CHARS[w];
+    const conv = (S.dms[w]||[]).slice(-30).map(m=>`${m.from==="gabi"?"Gabrielle":c.short}: ${m.text}`).join("\n");
+    const out = await askText(`Você é ${c.name}, de The Vampire Diaries, trocando DMs pelo celular com a Gabrielle Salvatore.
+Quem você é: ${c.voice}
+
+${worldBrief()}
+
+O QUE É PÚBLICO NAS REDES:
+${socialContext({dms:false})}
+
+CONVERSA ATÉ AGORA (mais antigas primeiro):
+${conv}
+
+Responda como ${c.short}, no estilo de mensagem de celular: 1 a 3 mensagens curtas, uma por linha. Só o texto das mensagens: sem nome na frente, sem aspas, sem narração, sem ações entre asteriscos. Nunca escreva nada como se fosse a Gabrielle. Você só sabe o que ${c.short} plausivelmente saberia; DMs de outras pessoas são privadas.`, {modelTier:"default"});
+    const parts = out.split("\n").map(s=>s.replace(new RegExp("^\\s*(?:"+c.short+"|"+c.name+")\\s*:\\s*","i"),"").replace(/^["“]|["”]$/g,"").trim()).filter(Boolean).slice(0,4);
+    parts.forEach((p,i)=>schedule({type:"dm", who:w, text:p}, 600 + i*1600));
+    wait = 800 + parts.length*1600;
+    markDirty();
+  }catch(e){ UI.dmAgain[w] = false; const m = errMsg(e); if (m) toast({text:m}); }
+  finally{
+    UI.dmPending[w] = false; renderDMs();
+    if (UI.dmAgain[w]){ UI.dmAgain[w] = false; setTimeout(()=>{ if (S.dms[w]?.at(-1)?.from==="gabi") generateDM(w); }, wait); }
+  }
+}
+
+/* ============================================================
+   Renderização
+   ============================================================ */
+function setTab(t){
+  UI.tab = t;
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.tab===t)));
+  document.querySelectorAll(".view").forEach(v=>v.hidden = v.id !== "v-"+t);
+  $("#composer").hidden = t !== "historia";
+  if (t==="insta" || t==="twitter"){ let ch=false; S.notifs.forEach(n=>{ if (n.tab===t && !n.read){ n.read=true; ch=true; } }); if (ch) markDirty(); }
+  if (t==="dms" && UI.thread) markThreadRead(UI.thread);
+  try{ sessionStorage.setItem("gs:tab", t); }catch{}
+  renderAll(t==="historia");
+}
+function markThreadRead(w){ let ch=false; S.notifs.forEach(n=>{ if (n.tab==="dms" && n.who===w && !n.read){ n.read=true; ch=true; } }); if (ch) markDirty(); }
+function renderAll(scrollStory){
+  const a = document.activeElement;
+  const fid = a && a.id && (a.tagName==="INPUT" || a.tagName==="TEXTAREA") ? a.id : null;
+  let s1 = null, s2 = null; try{ s1 = a.selectionStart; s2 = a.selectionEnd; }catch{}
+  renderHeader(); renderTabs();
+  if (UI.tab==="historia") renderStory(scrollStory);
+  if (UI.tab==="insta") renderInsta();
+  if (UI.tab==="twitter") renderTwitter();
+  if (UI.tab==="dms") renderDMs();
+  if (UI.tab==="ficha" && !document.activeElement?.closest?.("#fichaRoot")) renderFicha();
+  if (UI.sheet) renderSheet();
+  renderComposer();
+  if (fid){ const el = document.getElementById(fid); if (el && el !== document.activeElement){ el.focus({preventScroll:true}); try{ if (s1!=null) el.setSelectionRange(s1,s2); }catch{} } }
+}
+function renderHeader(){
+  const un = S.notifs.filter(n=>!n.read).length;
+  const b = $("#bellBadge"); b.hidden = !un; b.textContent = un > 99 ? "99+" : un;
+  const panel = $("#notifPanel"); panel.hidden = !UI.notifOpen; $("#bellBtn").setAttribute("aria-expanded", String(UI.notifOpen));
+  if (!UI.notifOpen) return;
+  const list = S.notifs.slice(-30).reverse();
+  panel.replaceChildren(
+    h("header",null,"Notificações", h("button",{onclick:()=>{ S.notifs.forEach(n=>n.read=true); markDirty(); renderAll(); }},"Marcar tudo como lido")),
+    list.length ? list.map(n=>h("button",{class:"nrow"+(n.read?"":" unread"), onclick:()=>openNotif(n)}, avatar(n.who,"sm"), h("span",{class:"nt"},n.text), h("time",null,rel(n.t))))
+      : h("div",{class:"empty-n"},"Nada por aqui ainda. Quando alguém comentar, tuitar ou mandar DM, aparece aqui.")
+  );
+}
+function openNotif(n){
+  n.read = true; UI.notifOpen = false; markDirty();
+  if (n.tab==="dms"){ UI.thread = n.who; setTab("dms"); }
+  else if (n.tab==="insta"){ setTab("insta"); if (n.ref && findPost(n.ref)) openSheet(n.ref); }
+  else if (n.tab==="twitter"){ UI.openTweet = n.ref || null; setTab("twitter"); }
+  else setTab(n.tab||"historia");
+}
+function renderTabs(){
+  const count = t => S.notifs.filter(n=>!n.read && n.tab===t).length;
+  document.querySelectorAll(".tab").forEach(b=>{
+    b.querySelector(".dot")?.remove();
+    const t = b.dataset.tab;
+    if ((t==="insta"||t==="twitter"||t==="dms") && count(t) && UI.tab!==t) b.append(h("span",{class:"dot","aria-label":"novidades"}));
+  });
+}
+function storyEl(m){
+  if (m.role==="sys"){
+    return h("div",{class:"sys"}, h("button",{onclick:()=>{ if (m.kind==="dm"){ UI.thread=m.who; setTab("dms"); } else if (m.kind==="tweet"){ UI.openTweet=m.ref; setTab("twitter"); } else { setTab("insta"); UI.instaSeg="feed"; if (m.ref) openSheet(m.ref); } }}, svg(ICON.phone), h("span",null,m.text)));
+  }
+  const isN = m.role==="narr";
+  return h("article",{class:"msg "+(isN?"narr":"gabi")}, h("div",{class:"lbl"}, isN ? "Narrador" : (S.ficha.nome||"Gabrielle").split(" ")[0]), h("div",{class:"txt"}, fmt(m.text)));
+}
+function renderStory(scroll){
+  const box = $("#storyList");
+  const view = $("#v-historia");
+  const near = view.scrollHeight - view.scrollTop - view.clientHeight < 120;
+  box.replaceChildren(...S.story.map(storyEl));
+  if (UI.streaming){
+    const el = h("article",{class:"msg narr",id:"streamEl"}, h("div",{class:"lbl"},"Narrador"), h("div",{class:"txt"}));
+    box.append(el); updateStream();
+  }
+  if (UI.storyErr){
+    box.append(h("div",{class:"errbox"}, h("span",null,UI.storyErr.msg), h("button",{class:"btn sm",onclick:()=>{ const t = UI.storyErr.turn; UI.storyErr=null; runNarrator(t); }},"Tentar de novo")));
+  }
+  if (scroll || near) requestAnimationFrame(()=>{ view.scrollTop = view.scrollHeight; });
+}
+function updateStream(){
+  const el = $("#streamEl .txt"); if (!el || !UI.streaming) return;
+  const vis = visibleNarr(UI.streaming.text);
+  if (!vis){ el.replaceChildren(h("span",{class:"thinking"},"O narrador está escrevendo")); }
+  else el.replaceChildren(fmt(vis));
+  const view = $("#v-historia");
+  if (view.scrollHeight - view.scrollTop - view.clientHeight < 220) view.scrollTop = view.scrollHeight;
+}
+function renderComposer(){
+  const send = $("#sendBtn");
+  if (UI.streaming){ send.textContent = "Parar"; send.classList.add("stop"); send.disabled = false; }
+  else { send.textContent = "Enviar"; send.classList.remove("stop"); send.disabled = !$("#storyInput").value.trim(); }
+  const acts = $("#storyActions"); acts.replaceChildren();
+  const last = lastTurn();
+  if (!UI.streaming && last){
+    const hasNarr = S.story.some(m=>m.role==="narr" && m.turn===last);
+    if (hasNarr || UI.storyErr) acts.append(h("button",{onclick:redoReply},"Refazer resposta"));
+    acts.append(h("button",{onclick:undoTurn},"Desfazer meu turno"));
+  }
+}
+
+/* Insta */
+function postTile(p){
+  const img = h("img",{alt:p.caption||"Foto da Gabrielle",loading:"lazy"});
+  loadPhoto(p.photo).then(u=>{ if (u) img.src = u; });
+  return h("button",{class:"tile",onclick:()=>openSheet(p.id),"aria-label":"Abrir foto"}, img,
+    p.status==="analyzing" ? h("span",{class:"an"},"vendo sua foto…") : (p.comments.length ? h("span",{class:"cc"}, String(p.comments.length)) : null));
+}
+function photoBlock(p){
+  if (p.photo){ const img = h("img",{class:"realphoto",alt:p.caption||"Foto"}); loadPhoto(p.photo).then(u=>{ if (u) img.src = u; }); return img; }
+  const c = CHARS[p.who]?.color || "#5b4a50";
+  return h("div",{class:"fakephoto",style:`background:linear-gradient(160deg, ${c}, #1b1418)`}, h("small",null,"foto"), h("p",null,p.desc||p.caption));
+}
+function likeBtn(obj, count){
+  return h("button",{class:"heart","aria-pressed":String(!!obj.liked),"aria-label":"Curtir",onclick:(e)=>{ obj.liked = !obj.liked; markDirty(); e.currentTarget.setAttribute("aria-pressed", String(obj.liked)); e.currentTarget.querySelector("b").textContent = nf((obj.likes||0)+(obj.liked?1:0)); }},
+    svg(ICON.heart), h("b",null,nf((count||0)+(obj.liked?1:0))));
+}
+function commentEl(c, onReply){
+  return h("div",{class:"cmt"}, avatar(c.who,"sm"), h("div",{class:"c-body"}, h("b",null,hd(c.who)), c.text,
+    h("div",{class:"c-meta"}, h("span",null,rel(c.t)), onReply && c.who!=="gabi" ? h("button",{onclick:()=>onReply(c)},"Responder") : null)));
+}
+function feedCard(p){
+  const shown = p.comments.slice(-2);
+  return h("article",{class:"card"},
+    h("div",{class:"card-h"}, avatar(p.who), h("div",null, h("div",{class:"who"},hd(p.who)), h("time",null,rel(p.t)))),
+    h("div",{onclick:()=>openSheet(p.id),style:"cursor:pointer"}, photoBlock(p)),
+    h("div",{class:"likes"}, likeBtn(p, p.likes), h("button",{class:"heart",onclick:()=>openSheet(p.id),"aria-label":"Comentários"}, svg(ICON.reply), h("b",null,String(p.comments.length)))),
+    p.caption ? h("div",{class:"cap"}, h("b",null,hd(p.who)), p.caption) : null,
+    p.comments.length > 2 ? h("button",{class:"more",onclick:()=>openSheet(p.id)},`Ver todos os ${p.comments.length} comentários`) : null,
+    shown.map(c=>commentEl(c))
+  );
+}
+function renderInsta(){
+  const root = $("#instaRoot"); if (!root || UI.tab!=="insta") return;
+  const mine = S.insta.posts.slice().reverse();
+  const np = UI.newPost;
+  const prof = h("div",{class:"prof"},
+    h("button",{style:"background:none;border:0;padding:0",title:"Trocar foto de perfil",onclick:()=>$("#avatarFile").click()}, avatar("gabi","lg")),
+    h("div",{class:"stats"},
+      h("div",{class:"stat"},h("b",null,nf(S.insta.posts.length)),h("span",null,"posts")),
+      h("div",{class:"stat"},h("b",null,nf(S.insta.followers)),h("span",null,"seguidores")),
+      h("div",{class:"stat"},h("b",null,nf(S.insta.following)),h("span",null,"seguindo"))));
+  const seg = h("div",{class:"seg"},
+    h("button",{class:"chip","aria-pressed":String(UI.instaSeg==="perfil"),onclick:()=>{UI.instaSeg="perfil";renderInsta();}},"Meu perfil"),
+    h("button",{class:"chip","aria-pressed":String(UI.instaSeg==="feed"),onclick:()=>{UI.instaSeg="feed";renderInsta();}},"Feed"),
+    h("span",{class:"grow"}),
+    UI.instaSeg==="perfil"
+      ? h("button",{class:"btn primary sm",onclick:()=>{ UI.newPost = UI.newPost ? null : {}; renderInsta(); }}, np ? "Fechar" : "Nova foto")
+      : h("button",{class:"btn sm",disabled:UI.feedBusy,onclick:refreshFeed}, UI.feedBusy ? "Carregando…" : "Ver posts novos"));
+  let composer = null;
+  if (np && UI.instaSeg==="perfil"){
+    const fileIn = h("input",{type:"file",accept:"image/*",id:"npFile",hidden:true,onchange:(e)=>{ const f = e.target.files?.[0]; if (!f) return; np.file = f; if (np.url) URL.revokeObjectURL(np.url); np.url = URL.createObjectURL(f); renderInsta(); }});
+    composer = h("div",{class:"newpost"}, fileIn,
+      np.url ? h("img",{class:"pv",src:np.url,alt:"Prévia da foto",onclick:()=>fileIn.click()}) : h("div",{class:"drop",onclick:()=>fileIn.click()},"Escolher foto"),
+      h("textarea",{class:"field",id:"npCaption",rows:"2",placeholder:"Legenda…",style:"font-family:var(--f-ui);font-size:15px",value:np.caption||"",oninput:(e)=>{np.caption=e.target.value;}}),
+      h("div",{class:"row",style:"justify-content:flex-end"}, h("button",{class:"btn primary",disabled:!np.file||np.busy,onclick:postPhoto}, np.busy ? "Postando…" : "Postar")));
+  }
+  let body;
+  if (UI.instaSeg==="perfil"){
+    body = [h("div",{class:"prof-name"},S.ficha.nome||"Gabrielle Salvatore"), h("div",{class:"prof-bio"},S.ficha.bio||""), seg, composer,
+      mine.length ? h("div",{class:"grid"}, mine.map(postTile)) : h("div",{class:"emptyst"},"Nenhuma foto ainda. Poste a primeira e veja quem aparece nos comentários.")];
+  } else {
+    const feed = S.insta.feed.slice().sort((a,b)=>b.t-a.t);
+    body = [h("div",{class:"prof-name"},S.ficha.nome||"Gabrielle Salvatore"), h("div",{class:"prof-bio"},S.ficha.bio||""), seg, feed.length ? feed.map(feedCard) : h("div",{class:"emptyst"},"O feed está vazio. Toque em Ver posts novos.")];
+  }
+  const st = $("#v-insta").scrollTop;
+  root.replaceChildren(prof, ...body.flat().filter(Boolean));
+  $("#v-insta").scrollTop = st;
+}
+function openSheet(id){ UI.sheet = {id, replyTo:null}; renderSheet(); }
+function closeSheet(){ UI.sheet = null; $("#sheetRoot").replaceChildren(); }
+function renderSheet(){
+  const root = $("#sheetRoot");
+  if (!UI.sheet){ root.replaceChildren(); return; }
+  const p = findPost(UI.sheet.id); if (!p){ closeSheet(); return; }
+  const mine = S.insta.posts.includes(p);
+  const w = mine ? "gabi" : p.who;
+  const prevInput = $("#sheetInput"); const draft = prevInput ? prevInput.value : "";
+  const prevScroll = $(".sheet-in")?.scrollTop;
+  const input = h("input",{id:"sheetInput",placeholder: UI.sheet.replyTo ? `Responder a @${hd(UI.sheet.replyTo)}…` : "Comentar…",value:draft,
+    onkeydown:(e)=>{ if (e.key==="Enter"){ e.preventDefault(); go(); } }, oninput:()=>{ btn.disabled = !input.value.trim(); }});
+  const btn = h("button",{disabled:!draft.trim(),onclick:()=>go()},"Publicar");
+  const go = ()=>{ const t = input.value; if (!t.trim()) return; input.value=""; const rt = UI.sheet.replyTo; UI.sheet.replyTo = null; commentOn(p.id, t, rt); };
+  const inner = h("div",{class:"sheet-in gut"},
+    h("div",{class:"sheet-bar"}, h("div",{class:"card-h",style:"margin:0"}, avatar(w,"sm"), h("div",{class:"who"},hd(w)), h("time",null,rel(p.t))), h("button",{class:"x",onclick:closeSheet},"Fechar")),
+    photoBlock(p),
+    h("div",{class:"likes"}, likeBtn(p, p.likes)),
+    p.caption ? h("div",{class:"cap"}, h("b",null,hd(w)), p.caption) : null,
+    p.status==="analyzing" ? h("div",{class:"status"},"Os personagens estão vendo sua foto…") : null,
+    p.status==="noai" ? h("div",{class:"status"},"Sem reações da IA para esta foto.") : null,
+    p.comments.map(c=>commentEl(c, (c2)=>{ UI.sheet.replyTo = c2.who; renderSheet(); $("#sheetInput")?.focus(); })),
+    h("div",{class:"inline-reply"}, input, btn),
+    mine ? h("div",{style:"margin-top:22px"}, h("button",{class:"btn ghost sm",onclick:()=>{ if (UI.sheet.confirmDel){ deletePost(p.id); } else { UI.sheet.confirmDel = true; renderSheet(); } }}, UI.sheet.confirmDel ? "Toque de novo para apagar a foto" : "Apagar foto")) : null
+  );
+  root.replaceChildren(h("div",{class:"sheet",onclick:(e)=>{ if (e.target===e.currentTarget) closeSheet(); }}, inner));
+  if (prevScroll != null) inner.scrollTop = prevScroll;
+}
+function deletePost(id){
+  const p = S.insta.posts.find(x=>x.id===id); if (!p) return;
+  S.insta.posts = S.insta.posts.filter(x=>x.id!==id);
+  S.queue = S.queue.filter(q=>q.postId!==id);
+  dropPhoto(p.photo);
+  closeSheet(); markDirty(); renderInsta();
+}
+
+/* Twitter */
+function tweetEl(t){
+  const open = UI.openTweet===t.id;
+  const replies = open ? h("div",{class:"replies"},
+    t.replies.map(r=>h("div",{class:"rep"}, avatar(r.who,"sm"), h("div",{class:"rb"}, h("div",{class:"rh"}, h("b",null,who(r.who).name)," ", h("span",null,"@"+hd(r.who)+" · "+rel(r.t))), h("div",null,r.text)))),
+    (()=>{ const inp = h("input",{placeholder:"Responder…",id:"rep-"+t.id,onkeydown:(e)=>{ if (e.key==="Enter"){ e.preventDefault(); const v=inp.value; inp.value=""; replyTweet(t.id, v); } }});
+      return h("div",{class:"inline-reply"}, inp, h("button",{onclick:()=>{ const v=inp.value; inp.value=""; replyTweet(t.id, v); }},"Responder")); })()
+  ) : null;
+  return h("article",{class:"tw"}, avatar(t.who),
+    h("div",{class:"body"},
+      h("div",{class:"head"}, h("b",null,who(t.who).name), h("span",null,"@"+hd(t.who)+" · "+rel(t.t))),
+      h("div",{class:"text"}, t.text),
+      h("div",{class:"bar"},
+        h("button",{onclick:()=>{ UI.openTweet = open ? null : t.id; renderTwitter(); },"aria-expanded":String(open),"aria-label":"Respostas"}, svg(ICON.reply), String(t.replies.length)),
+        h("button",{"aria-label":"Retuítes",tabindex:"-1"}, svg(ICON.rt), nf(t.rts||0)),
+        h("button",{"aria-pressed":String(!!t.liked),"aria-label":"Curtir",onclick:()=>{ t.liked=!t.liked; markDirty(); renderTwitter(); }}, svg(ICON.heart), nf((t.likes||0)+(t.liked?1:0)))),
+      replies));
+}
+function renderTwitter(){
+  const root = $("#twRoot"); if (!root || UI.tab!=="twitter") return;
+  const prev = $("#twInput"); const draft = prev ? prev.value : "";
+  const focusedRep = document.activeElement?.id?.startsWith("rep-") ? document.activeElement.id : null;
+  const repDraft = focusedRep ? document.activeElement.value : "";
+  const ta = h("textarea",{id:"twInput",maxlength:"280",placeholder:"O que está acontecendo em Mystic Falls?",value:draft,oninput:()=>{ cnt.textContent = 280-ta.value.length; sb.disabled = !ta.value.trim(); }});
+  const cnt = h("span",{class:"count"}, String(280-draft.length));
+  const sb = h("button",{class:"btn primary sm",disabled:!draft.trim(),onclick:sendTweet},"Tuitar");
+  const st = $("#v-twitter").scrollTop;
+  root.replaceChildren(
+    h("div",{class:"tw-compose"}, h("div",{class:"row",style:"align-items:flex-start"}, avatar("gabi"), ta), h("div",{class:"row"}, h("button",{class:"btn sm",disabled:UI.twBusy,onclick:refreshTweets}, UI.twBusy ? "Carregando…" : "Ver tweets novos"), h("div",{class:"row",style:"align-items:center"}, cnt, sb))),
+    ...S.tweets.slice().sort((a,b)=>b.t-a.t).map(tweetEl)
+  );
+  $("#v-twitter").scrollTop = st;
+  if (focusedRep){ const el = document.getElementById(focusedRep); if (el) el.value = repDraft; }
+}
+
+/* DMs */
+function renderDMs(scrollEnd){
+  const root = $("#dmRoot"); if (!root || UI.tab!=="dms") return;
+  if (UI.thread && CHARS[UI.thread]) return renderThread(UI.thread, scrollEnd);
+  const threads = Object.entries(S.dms).filter(([,a])=>a.length).sort((a,b)=>b[1].at(-1).t - a[1].at(-1).t);
+  const unreadFrom = new Set(S.notifs.filter(n=>n.tab==="dms" && !n.read).map(n=>n.who));
+  const open = w=>{ UI.thread = w; markThreadRead(w); renderAll(); };
+  root.replaceChildren(h("div",{class:"view-inner gut"},
+    h("div",{class:"sect"},"Nova conversa"),
+    h("div",{class:"people"}, CHAR_IDS.map(id=>h("button",{class:"person",onclick:()=>open(id)}, avatar(id), CHARS[id].short))),
+    h("div",{class:"sect"},"Conversas"),
+    threads.length ? h("div",{class:"dm-list"}, threads.map(([w,a])=>{ const last = a.at(-1); const un = unreadFrom.has(w);
+      return h("button",{class:"dm-row"+(un?" unread":""),onclick:()=>open(w)}, avatar(w), h("div",{class:"mid"}, h("b",null,who(w).name), h("span",null,(last.from==="gabi"?"Você: ":"")+last.text)), h("div",{class:"r"}, rel(last.t), un ? h("span",{class:"udot"}) : null)); }))
+      : h("div",{class:"emptyst"},"Nenhuma conversa ainda. Escolha alguém acima ou espere alguém te escrever.")
+  ));
+}
+function threadTyping(w){ return !!UI.dmPending[w] || S.queue.some(q=>q.type==="dm" && q.who===w && q.at - Date.now() < 4500); }
+function renderThread(w, scrollEnd){
+  const root = $("#dmRoot");
+  const prev = $("#dmInput"); const draft = prev ? prev.value : ""; const hadFocus = document.activeElement===prev;
+  const prevBox = $(".bubbles"); const nearEnd = !prevBox || prevBox.scrollHeight - prevBox.scrollTop - prevBox.clientHeight < 80;
+  const msgs = S.dms[w] || [];
+  const box = h("div",{class:"bubbles gut"});
+  let lastT = 0, lastFrom = null;
+  msgs.forEach(m=>{
+    if (m.t - lastT > 20*MIN) box.append(h("div",{class:"stamp"}, new Date(m.t).toLocaleString("pt-BR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})));
+    box.append(h("div",{class:"bub "+(m.from==="gabi"?"me":"them")+(lastFrom && lastFrom!==m.from ? " gap":"")}, m.text));
+    lastT = m.t; lastFrom = m.from;
+  });
+  const typing = threadTyping(w); UI.lastTyping = typing;
+  if (typing) box.append(h("div",{class:"typing","aria-label":"digitando"}, h("i"),h("i"),h("i")));
+  if (!msgs.length && !typing) box.append(h("div",{class:"emptyst"},`Comece a conversa com ${CHARS[w].short}.`));
+  const ta = h("textarea",{id:"dmInput",rows:"1",placeholder:"Mensagem…",value:draft,
+    oninput:()=>{ autosize(ta); sb.disabled = !ta.value.trim(); },
+    onkeydown:(e)=>{ if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendDM(w); } }});
+  const sb = h("button",{class:"send",disabled:!draft.trim(),onclick:()=>sendDM(w)},"Enviar");
+  root.replaceChildren(h("div",{class:"thread"},
+    h("div",{class:"th-head gut"}, h("button",{class:"back","aria-label":"Voltar",onclick:()=>{ UI.thread=null; renderDMs(); }},"‹"), avatar(w), h("div",null, h("b",null,CHARS[w].name), h("small",null, typing ? "digitando…" : "@"+CHARS[w].handle))),
+    box,
+    h("div",{class:"th-input gut"}, ta, sb)));
+  if (scrollEnd || nearEnd) box.scrollTop = box.scrollHeight;
+  else if (prevBox) box.scrollTop = prevBox.scrollTop;
+  if (scrollEnd && hadFocus) ta.focus();
+  autosize(ta);
+}
+
+/* Ficha */
+function renderFicha(){
+  const root = $("#fichaRoot"); if (!root || UI.tab!=="ficha") return;
+  const focusedId = document.activeElement?.id;
+  const fields = FICHA_FIELDS.map(([k,label,rows])=>h("div",{class:"f"}, h("label",{for:"f-"+k},label),
+    rows===1 ? h("input",{id:"f-"+k,value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; markDirty(); }})
+             : h("textarea",{id:"f-"+k,rows:String(rows),value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; fitTA(e.target); markDirty(); }})));
+  const since = S.turn - (S.memoryTurn||0);
+  root.replaceChildren(
+    h("h2",null,"Ficha"),
+    h("p",{class:"lead"},"Tudo aqui vai para o narrador e para os personagens. Edite quando quiser; vale a partir da próxima resposta."),
+    ...fields,
+    h("div",{class:"f"}, h("label",{for:"f-rules"},"Regras do narrador"), h("textarea",{id:"f-rules",rows:"5",value:S.rules,oninput:(e)=>{ S.rules=e.target.value; fitTA(e.target); markDirty(); }})),
+    h("h2",null,"Memória do mundo"),
+    h("p",{class:"lead"},"Um resumo do que já aconteceu. Ele se atualiza sozinho a cada 5 turnos, e você pode corrigir à mão."),
+    h("div",{class:"memory"},
+      h("div",{class:"f"}, h("label",{for:"f-memory"},`Turno ${S.turn} · atualizada no turno ${S.memoryTurn||0}`), h("textarea",{id:"f-memory",rows:"9",value:S.memory,oninput:(e)=>{ S.memory=e.target.value; fitTA(e.target); markDirty(); }})),
+      h("div",{class:"memrow"}, h("span",null, since>=5 ? "Atualiza depois da próxima resposta." : `Próxima atualização em ${5-since} ${5-since===1?"turno":"turnos"}.`),
+        h("button",{class:"btn sm",disabled:UI.memBusy,onclick:()=>updateMemory(true)}, UI.memBusy ? "Atualizando…" : "Atualizar agora"))),
+    h("div",{class:"danger"},
+      h("p",null,"Recomeçar apaga a história, os posts, os tweets e as DMs, e volta para o prólogo. A ficha e as regras ficam."),
+      UI.confirmReset
+        ? h("div",{class:"confirm"}, h("div",null,"Apagar tudo e voltar ao prólogo? Não dá para desfazer."),
+            h("div",{class:"row"}, h("button",{class:"btn primary",onclick:resetGame},"Apagar e recomeçar"), h("button",{class:"btn ghost",onclick:()=>{ UI.confirmReset=false; renderFicha(); }},"Cancelar")))
+        : h("button",{class:"btn ghost",onclick:()=>{ UI.confirmReset=true; renderFicha(); }},"Recomeçar do zero"))
+  );
+  root.querySelectorAll("textarea").forEach(fitTA);
+  if (focusedId){ const el = document.getElementById(focusedId); el?.focus(); }
+}
+function fitTA(t){ t.style.height = "auto"; t.style.height = (t.scrollHeight + 2) + "px"; }
+function resetGame(){
+  narrCtl?.abort();
+  S.insta.posts.forEach(p=>dropPhoto(p.photo));
+  S = newGame({ficha:S.ficha, rules:S.rules, insta:S.insta});
+  UI.confirmReset = false; UI.streaming = null; UI.storyErr = null; UI.thread = null; UI.sheet = null;
+  persist();
+  setTab("historia");
+  toast({text:"História recomeçada do prólogo."});
+}
+
+/* Toast */
+let toastTimer = null;
+function toast(n){
+  const root = $("#toastRoot");
+  const el = h(n.tab ? "button" : "div",{class:"toast",role:"status",onclick: n.tab ? ()=>{ root.replaceChildren(); openNotif(n); } : null},
+    n.who ? avatar(n.who,"sm") : null, h("span",{class:"nt"}, n.text));
+  root.replaceChildren(el);
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>root.replaceChildren(), 4500);
+}
+
+/* ============================================================
+   Eventos
+   ============================================================ */
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+$("#bellBtn").addEventListener("click",(e)=>{ e.stopPropagation(); UI.notifOpen = !UI.notifOpen; renderHeader(); });
+document.addEventListener("click",(e)=>{ if (UI.notifOpen && !e.target.closest("#notifPanel") && !e.target.closest("#bellBtn")){ UI.notifOpen=false; renderHeader(); } });
+document.addEventListener("keydown",(e)=>{ if (e.key==="Escape"){ if (UI.sheet) closeSheet(); if (UI.notifOpen){ UI.notifOpen=false; renderHeader(); } } });
+const storyInput = $("#storyInput");
+storyInput.addEventListener("input",()=>{ autosize(storyInput); renderComposer(); try{ sessionStorage.setItem("gs:draft", storyInput.value); }catch{} });
+storyInput.addEventListener("keydown",(e)=>{ if (e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); sendStory(); } });
+$("#sendBtn").addEventListener("click",()=>{ if (UI.streaming) narrCtl?.abort(); else sendStory(); });
+$("#avatarFile").addEventListener("change", async (e)=>{
+  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
+  try{ const img = await compressImage(f, 320, 0.85); const id = "avatar-"+uid(); const old = S.insta.avatar; await storePhoto(id, img.dataURL); S.insta.avatar = id; if (old) dropPhoto(old); markDirty(); renderAll(); }
+  catch{ toast({text:"Não deu para abrir essa imagem. Tente outra."}); }
+});
+document.addEventListener("visibilitychange",()=>{ if (document.hidden) persist(); });
+window.addEventListener("pagehide", persist);
+
+/* Início */
+try{ const d = sessionStorage.getItem("gs:draft"); if (d) storyInput.value = d; }catch{}
+let startTab = "historia"; try{ startTab = sessionStorage.getItem("gs:tab") || "historia"; }catch{}
+setTab(["historia","insta","twitter","dms","ficha"].includes(startTab) ? startTab : "historia");
+autosize(storyInput);
+setInterval(tick, 1500);
+initCloud();
+</script>
