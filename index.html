@@ -269,6 +269,11 @@ button{cursor:pointer}
 .gal-sel p{margin:0;font-size:13.5px;color:var(--muted);font-family:var(--f-body);font-style:italic}
 .gal-sel .row{flex-wrap:wrap}
 
+.vh{position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+label.btn{display:inline-flex;align-items:center;cursor:pointer}
+label.btn.off{opacity:.5;pointer-events:none}
+.avpick{cursor:pointer;display:grid;justify-items:center;gap:6px;font-size:12px;color:var(--rose)}
+
 /* Toast */
 .toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:50;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:10px;align-items:center;text-align:left;font-size:13.5px;animation:drop .25s ease-out}
 .toast .nt{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -323,8 +328,9 @@ button{cursor:pointer}
 </div>
 <div id="sheetRoot"></div>
 <div id="toastRoot"></div>
-<input type="file" id="avatarFile" accept="image/*" hidden>
-<input type="file" id="galFile" accept="image/*" multiple hidden>
+<input type="file" id="avatarFile" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
+<input type="file" id="galFile" class="vh" accept="image/*" multiple tabindex="-1" aria-hidden="true">
+<input type="file" id="npFile" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
 
 <script>
 "use strict";
@@ -628,7 +634,7 @@ const photoMem = {};
 async function storePhoto(id, dataURL){
   photoMem[id] = dataURL;
   try{ localStorage.setItem("gs:p:"+id, dataURL); }catch{}
-  if (Cloud){ try{ await photoCol().doc(id).set({d:dataURL,t:Date.now()}); }catch(e){ console.warn("photo", e); toast({text:"A foto não foi salva na sua conta, só neste aparelho."}); } }
+  if (Cloud) photoCol().doc(id).set({d:dataURL,t:Date.now()}).catch(e=>{ console.warn("photo", e); toast({text:"A foto não foi salva na sua conta, só neste aparelho."}); });
 }
 async function loadPhoto(id){
   if (!id) return null;
@@ -653,9 +659,24 @@ function compressImage(file, max=760, q=0.8){
         const fr = new FileReader(); fr.onload = ()=>res({blob, dataURL:fr.result}); fr.onerror = rej; fr.readAsDataURL(blob);
       }, "image/jpeg", q);
     };
-    img.onerror = ()=>{ URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.onerror = async ()=>{
+      URL.revokeObjectURL(url);
+      try{
+        const bmp = await createImageBitmap(file);
+        const sc = Math.min(1, max/Math.max(bmp.width,bmp.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(bmp.width*sc); c.height = Math.round(bmp.height*sc);
+        c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+        c.toBlob(blob=>{ if (!blob) return rej(new Error("blob")); const fr = new FileReader(); fr.onload = ()=>res({blob, dataURL:fr.result}); fr.onerror = rej; fr.readAsDataURL(blob); }, "image/jpeg", q);
+      }catch{ rej(new Error("img")); }
+    };
     img.src = url;
   });
+}
+function badImageMsg(f){
+  return /heic|heif/i.test((f?.type||"") + (f?.name||""))
+    ? "Esse formato do iPhone (HEIC) não abriu aqui. Tire um print da foto e envie o print, ou escolha a foto pela galeria do app Fotos."
+    : "Não deu para abrir essa imagem. Tente outra foto.";
 }
 
 /* ============================================================
@@ -1010,7 +1031,7 @@ async function postPhoto(){
   const caption = ($("#npCaption")?.value||"").trim();
   np.busy = true; renderInsta();
   let img;
-  try{ img = await fitPhoto(np.file); }catch{ np.busy=false; toast({text:"Não deu para abrir essa imagem. Tente outra foto."}); renderInsta(); return; }
+  try{ img = await fitPhoto(np.file); }catch{ np.busy=false; toast({text:badImageMsg(np.file)}); renderInsta(); return; }
   const id = uid();
   await storePhoto(id, img.dataURL);
   const post = {id, photo:id, caption, desc:"", likes:0, t:Date.now(), comments:[], status:"analyzing"};
@@ -1171,7 +1192,7 @@ async function addGallery(w, files){
       const it = {id, desc:"", t:Date.now()};
       g.photos.push(it); items.push({it, blob:img.blob});
       markDirty(); renderFicha();
-    }catch{ toast({text:"Uma das imagens não abriu. Tente outra."}); }
+    }catch{ toast({text:badImageMsg(f)}); }
   }
   UI.galBusy[w] = false; renderFicha();
   await describeGallery(w, items);
@@ -1228,7 +1249,7 @@ function galleryPanel(){
     }
     wrap.append(h("div",{class:"gal-row"},
       h("div",{class:"gal-h"}, avatar(id,"sm"), h("b",null,CHARS[id].name), h("span",{class:"meta"}, n ? `${n} ${n===1?"foto":"fotos"}` : "sem fotos"), h("span",{class:"grow"}),
-        h("button",{class:"btn sm",disabled:!!UI.galBusy[id],onclick:()=>{ UI.galTarget = id; $("#galFile").click(); }}, UI.galBusy[id] ? "Enviando…" : "Adicionar")),
+        h("label",{class:"btn sm"+(UI.galBusy[id]?" off":""),for:"galFile",onclick:()=>{ UI.galTarget = id; }}, UI.galBusy[id] ? "Enviando…" : "Adicionar")),
       strip, sel));
   }
   return wrap;
@@ -1499,7 +1520,7 @@ function renderInsta(){
   const mine = S.insta.posts.slice().reverse();
   const np = UI.newPost;
   const prof = h("div",{class:"prof"},
-    h("button",{style:"background:none;border:0;padding:0",title:"Trocar foto de perfil",onclick:()=>$("#avatarFile").click()}, avatar("gabi","lg")),
+    h("label",{class:"avpick",for:"avatarFile",title:"Trocar foto de perfil"}, avatar("gabi","lg"), UI.avatarBusy ? "enviando…" : "trocar foto"),
     h("div",{class:"stats"},
       h("div",{class:"stat"},h("b",null,nf(S.insta.posts.length)),h("span",null,"posts")),
       h("div",{class:"stat"},h("b",null,nf(S.insta.followers)),h("span",null,"seguidores")),
@@ -1513,9 +1534,8 @@ function renderInsta(){
       : h("button",{class:"btn sm",disabled:UI.feedBusy,onclick:refreshFeed}, UI.feedBusy ? "Carregando…" : "Ver posts novos"));
   let composer = null;
   if (np && UI.instaSeg==="perfil"){
-    const fileIn = h("input",{type:"file",accept:"image/*",id:"npFile",hidden:true,onchange:(e)=>{ const f = e.target.files?.[0]; if (!f) return; np.file = f; if (np.url) URL.revokeObjectURL(np.url); np.url = URL.createObjectURL(f); renderInsta(); }});
-    composer = h("div",{class:"newpost"}, fileIn,
-      np.url ? h("img",{class:"pv",src:np.url,alt:"Prévia da foto",onclick:()=>fileIn.click()}) : h("div",{class:"drop",onclick:()=>fileIn.click()},"Escolher foto"),
+    composer = h("div",{class:"newpost"},
+      np.url ? h("label",{for:"npFile",style:"cursor:pointer"}, h("img",{class:"pv",src:np.url,alt:"Prévia da foto"})) : h("label",{class:"drop",for:"npFile",style:"display:block"},"Escolher foto"),
       h("textarea",{class:"field",id:"npCaption",rows:"2",placeholder:"Legenda…",style:"font-family:var(--f-ui);font-size:15px",value:np.caption||"",oninput:(e)=>{np.caption=e.target.value;}}),
       h("div",{class:"row",style:"justify-content:flex-end"}, h("button",{class:"btn primary",disabled:!np.file||np.busy,onclick:postPhoto}, np.busy ? "Postando…" : "Postar")));
   }
@@ -1717,11 +1737,24 @@ storyInput.addEventListener("input",()=>{ autosize(storyInput); renderComposer()
 storyInput.addEventListener("keydown",(e)=>{ if (e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); sendStory(); } });
 $("#sendBtn").addEventListener("click",()=>{ if (UI.streaming) narrCtl?.abort(); else sendStory(); });
 $("#avatarFile").addEventListener("change", async (e)=>{
-  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
-  try{ const img = await compressImage(f, 320, 0.85); const id = "avatar-"+uid(); const old = S.insta.avatar; await storePhoto(id, img.dataURL); S.insta.avatar = id; if (old) dropPhoto(old); markDirty(); renderAll(); }
-  catch{ toast({text:"Não deu para abrir essa imagem. Tente outra."}); }
+  const f = e.target.files?.[0]; if (!f) return;
+  UI.avatarBusy = true; renderInsta();
+  try{
+    const img = await compressImage(f, 320, 0.85);
+    const id = "avatar-"+uid(); const old = S.insta.avatar;
+    storePhoto(id, img.dataURL);
+    S.insta.avatar = id; if (old) dropPhoto(old);
+    markDirty(); toast({text:"Foto de perfil trocada."});
+  }catch{ toast({text:badImageMsg(f)}); }
+  finally{ e.target.value = ""; UI.avatarBusy = false; renderAll(); }
 });
-$("#galFile").addEventListener("change",(e)=>{ const files = Array.from(e.target.files||[]); e.target.value = ""; if (UI.galTarget) addGallery(UI.galTarget, files); });
+$("#npFile").addEventListener("change",(e)=>{
+  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
+  const np = (UI.newPost ||= {});
+  np.file = f; if (np.url) URL.revokeObjectURL(np.url); np.url = URL.createObjectURL(f);
+  UI.instaSeg = "perfil"; renderInsta();
+});
+$("#galFile").addEventListener("change",(e)=>{ const files = Array.from(e.target.files||[]); e.target.value = ""; if (UI.galTarget && files.length) addGallery(UI.galTarget, files); });
 document.addEventListener("visibilitychange",()=>{ if (document.hidden) persist(); });
 window.addEventListener("pagehide", persist);
 
