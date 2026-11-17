@@ -335,6 +335,7 @@ label.btn.off{opacity:.5;pointer-events:none}
 <div id="toastRoot"></div>
 <input type="file" id="avatarFile" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
 <input type="file" id="galFile" class="vh" accept="image/*" multiple tabindex="-1" aria-hidden="true">
+<input type="file" id="backupFile" class="vh" accept=".json,application/json" tabindex="-1" aria-hidden="true">
 <input type="file" id="npFile" class="vh" accept="image/*" tabindex="-1" aria-hidden="true">
 
 <script>
@@ -457,9 +458,10 @@ function newGame(keep){
   };
 }
 
+const LKEY = "gs:state:v1";
 let S = loadLocal() || newGame();
 S.gallery ||= {};
-let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, galBusy:{}, galSel:null, galTarget:null, galDescBusy:false, lastTyping:false, feedBusy:false, twBusy:false};
+let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, backupBusy:false, importPending:null, galBusy:{}, galSel:null, galTarget:null, galDescBusy:false, lastTyping:false, feedBusy:false, twBusy:false};
 
 /* ============================================================
    Utilidades
@@ -552,7 +554,6 @@ function autosize(t){ t.style.height="auto"; t.style.height = Math.min(t.scrollH
 /* ============================================================
    Salvamento: local + conta (db)
    ============================================================ */
-const LKEY = "gs:state:v1";
 function loadLocal(){ try{ const raw = localStorage.getItem(LKEY); if (!raw) return null; const s = JSON.parse(raw); return s && s.v===1 && Array.isArray(s.story) ? s : null; }catch{ return null; } }
 function saveLocal(){ try{ localStorage.setItem(LKEY, JSON.stringify(S)); }catch{} }
 let Cloud = null, saveTimer = null, saveChain = Promise.resolve(), lastChunkJSON = [];
@@ -636,21 +637,31 @@ async function initCloud(){
   }catch(e){ console.warn("cloud", e); Cloud = null; setPill("local"); }
 }
 
-/* Fotos */
+/* Fotos: memória, IndexedDB do aparelho e, no Claude, a conta */
 const photoMem = {};
+const IDB = (()=>{
+  let dbp = null;
+  const open = ()=> dbp ||= new Promise((res,rej)=>{
+    try{ const r = indexedDB.open("gabrielle", 1); r.onupgradeneeded = ()=>r.result.createObjectStore("photos"); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }
+    catch(e){ rej(e); }
+  });
+  const run = (mode, fn)=>open().then(db=>new Promise((res,rej)=>{ const t = db.transaction("photos", mode); const req = fn(t.objectStore("photos")); t.oncomplete = ()=>res(req?.result); t.onerror = ()=>rej(t.error); t.onabort = ()=>rej(t.error); }));
+  return { get:k=>run("readonly", st=>st.get(k)), put:(k,v)=>run("readwrite", st=>st.put(v,k)), del:k=>run("readwrite", st=>st.delete(k)) };
+})();
 async function storePhoto(id, dataURL){
   photoMem[id] = dataURL;
-  try{ localStorage.setItem("gs:p:"+id, dataURL); }catch{}
+  try{ await IDB.put(id, dataURL); }catch{ try{ localStorage.setItem("gs:p:"+id, dataURL); }catch{} }
   if (Cloud) photoCol().doc(id).set({d:dataURL,t:Date.now()}).catch(e=>{ console.warn("photo", e); toast({text:"A foto não foi salva na sua conta, só neste aparelho."}); });
 }
 async function loadPhoto(id){
   if (!id) return null;
   if (photoMem[id]) return photoMem[id];
+  try{ const v = await IDB.get(id); if (v){ photoMem[id]=v; return v; } }catch{}
   try{ const v = localStorage.getItem("gs:p:"+id); if (v){ photoMem[id]=v; return v; } }catch{}
   if (Cloud){ try{ const s = await photoCol().doc(id).get(); if (s.exists){ photoMem[id] = s.data().d; return photoMem[id]; } }catch{} }
   return null;
 }
-async function dropPhoto(id){ delete photoMem[id]; try{ localStorage.removeItem("gs:p:"+id); }catch{} if (Cloud){ try{ await photoCol().doc(id).delete(); }catch{} } }
+async function dropPhoto(id){ delete photoMem[id]; try{ await IDB.del(id); }catch{} try{ localStorage.removeItem("gs:p:"+id); }catch{} if (Cloud){ try{ await photoCol().doc(id).delete(); }catch{} } }
 /* Abre a imagem de três jeitos, porque cada celular bloqueia um: link temporário, texto data: e bitmap. */
 function readAsDataURL(file){
   return new Promise((res,rej)=>{ const fr = new FileReader(); fr.onload = ()=>res(fr.result); fr.onerror = ()=>rej(fr.error||new Error("read")); fr.readAsDataURL(file); });
@@ -706,13 +717,74 @@ function badImageMsg(f){
 /* ============================================================
    IA (capacidade "sample" do Claude)
    ============================================================ */
+/* No Claude, a IA vem da conta (capacidade "sample"). No site próprio, vem do servidor /api/claude com a sua chave. */
+const SITE = !(window.claude && typeof window.claude.use === "function");
+const KEY_LS = "gs:appkey";
+function appKey(){ try{ return localStorage.getItem(KEY_LS) || ""; }catch{ return ""; } }
+function setAppKey(v){ try{ v ? localStorage.setItem(KEY_LS, v) : localStorage.removeItem(KEY_LS); }catch{} updateBanner(); }
+function blobToBase64(b){ return readAsDataURL(b).then(d=>({type:b.type||"image/jpeg", data:String(d).split(",")[1]})); }
+function parseLooseJSON(text){
+  const t = String(text||"").trim();
+  try{ return JSON.parse(t); }catch{}
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (fence){ try{ return JSON.parse(fence[1]); }catch{} }
+  const a = t.search(/[\[{]/), z = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+  if (a >= 0 && z > a){ try{ return JSON.parse(t.slice(a, z+1)); }catch{} }
+  throw {code:"invalid_json", text:t};
+}
+function siteAI(){
+  const call = async (input, opts={})=>{
+    const key = appKey(); if (!key) throw {code:"no_key"};
+    let messages = typeof input === "string" ? [{role:"user", content:input}] : input.map(m=>({role:m.role, content:m.content}));
+    if (opts.wantJSON){ const last = messages[messages.length-1]; last.content += "\n\nResponda apenas com o JSON, sem nenhum texto antes ou depois."; }
+    const images = opts.images ? await Promise.all(Array.from(opts.images).map(blobToBase64)) : undefined;
+    let res;
+    try{
+      res = await fetch("api/claude", {method:"POST", headers:{"content-type":"application/json","x-app-key":key},
+        body: JSON.stringify({tier: opts.modelTier||"default", messages, images, stable: !!opts.stable}), signal: opts.signal});
+    }catch(e){ throw {code: e?.name==="AbortError" ? "cancelled" : "offline"}; }
+    if (!res.ok){ let j = {}; try{ j = await res.json(); }catch{} throw {code: j.error || "upstream_error", message: j.message}; }
+    const reader = res.body.getReader(); const dec = new TextDecoder();
+    let buf = "", text = "", final = null;
+    try{
+      for (;;){
+        const {value, done} = await reader.read(); if (done) break;
+        buf += dec.decode(value, {stream:true});
+        let i;
+        while ((i = buf.indexOf("\n")) >= 0){
+          const line = buf.slice(0, i).trim(); buf = buf.slice(i+1); if (!line) continue;
+          let ev; try{ ev = JSON.parse(line); }catch{ continue; }
+          if (ev.t){ text += ev.t; try{ opts.onText?.({text, delta:ev.t}); }catch{} }
+          else if (ev.error) throw {code:ev.error, message:ev.message, text: ev.error==="refused" ? undefined : text};
+          else if (ev.done) final = ev;
+        }
+      }
+    }catch(e){ if (e?.code) throw e; throw {code: e?.name==="AbortError" ? "cancelled" : "upstream_error", text}; }
+    if (!final) throw {code:"upstream_error", text};
+    if (final.text && final.text !== text){ text = final.text; try{ opts.onText?.({text, delta:""}); }catch{} }
+    if (!text.trim()) throw {code:"empty_completion"};
+    return {text, truncated: !!final.truncated};
+  };
+  call.json = async (input, opts={})=> parseLooseJSON((await call(input, {...opts, wantJSON:true})).text);
+  call.limits = async ()=>({maxPromptBytes:262144, images:{maxCount:5, maxInputBytes:20e6, mediaTypes:["image/jpeg","image/png","image/webp","image/gif"]}});
+  return call;
+}
+function updateBanner(){
+  const b = $("#aiBanner"); if (!b) return;
+  if (SITE){ b.textContent = "Coloque a senha do app na aba Ficha para o narrador e os personagens funcionarem."; b.hidden = !!appKey(); }
+}
 let AI = null, canImages = false, imgMax = 5;
-const aiReady = (window.claude?.use ? window.claude.use("sample") : Promise.resolve(null))
-  .then(s=>{ AI = s; if (!s) $("#aiBanner").hidden = false; else s.limits?.().then(l=>{ canImages = !!l?.images; imgMax = l?.images?.maxCount || 5; }).catch(()=>{}); return s; })
+const aiReady = (SITE ? Promise.resolve(siteAI()) : window.claude.use("sample"))
+  .then(s=>{ AI = s; if (!s) $("#aiBanner").hidden = false; else s.limits?.().then(l=>{ canImages = !!l?.images; imgMax = l?.images?.maxCount || 5; }).catch(()=>{}); updateBanner(); return s; })
   .catch(()=>{ $("#aiBanner").hidden = false; return null; });
 function errMsg(e){
   switch (e?.code){
     case "no_ai": return "A IA só funciona com a página aberta no Claude.";
+    case "no_key": return "Coloque a senha do app na aba Ficha.";
+    case "bad_password": return "A senha do app está errada. Confira na aba Ficha.";
+    case "not_configured": return "O site ainda não tem a chave da Anthropic ou a senha configuradas na Cloudflare.";
+    case "bad_api_key": return "A chave da Anthropic foi recusada. Confira a chave na Cloudflare.";
+    case "offline": return "Sem conexão com o servidor. Confira a internet e tente de novo.";
+    case "invalid_request": return "A Anthropic recusou o pedido" + (e.message ? ": " + e.message : ". Confira se ainda tem crédito na conta.");
     case "not_granted": return "A IA não foi liberada para esta página. Libere no menu de permissões do artifact e tente de novo.";
     case "rate_limited": return "Limite de uso do Claude atingido por agora. Tente de novo em alguns minutos.";
     case "refused": return "O Claude recusou esse trecho. Reescreva o turno de outro jeito.";
@@ -883,7 +955,7 @@ async function runNarrator(turn){
   try{
     const ai = await needAI();
     const r = await ai(buildNarratorInput(turn), {
-      modelTier: S.eco ? "default" : "complex", cache:false, signal:narrCtl.signal,
+      modelTier: S.eco ? "default" : "complex", cache:false, signal:narrCtl.signal, stable:true,
       onText:({text})=>{ if (UI.streaming){ UI.streaming.text = text; updateStream(); } },
     });
     if (S.turn < turn || !S.story.some(m=>m.turn===turn && m.role==="gabi")){ UI.streaming = null; renderStory(); return; }
@@ -1444,11 +1516,11 @@ function renderHeader(){
   const panel = $("#notifPanel"); panel.hidden = !UI.notifOpen; $("#bellBtn").setAttribute("aria-expanded", String(UI.notifOpen));
   if (!UI.notifOpen) return;
   const list = S.notifs.slice(-30).reverse();
-  panel.replaceChildren(
+  panel.replaceChildren(...[
     h("header",null,"Notificações", h("button",{onclick:()=>{ S.notifs.forEach(n=>n.read=true); markDirty(); renderAll(); }},"Marcar tudo como lido")),
     list.length ? list.map(n=>h("button",{class:"nrow"+(n.read?"":" unread"), onclick:()=>openNotif(n)}, avatar(n.who,"sm"), h("span",{class:"nt"},n.text), h("time",null,rel(n.t))))
       : h("div",{class:"empty-n"},"Nada por aqui ainda. Quando alguém comentar, tuitar ou mandar DM, aparece aqui.")
-  );
+  ].flat());
 }
 function openNotif(n){
   n.read = true; UI.notifOpen = false; markDirty();
@@ -1703,13 +1775,16 @@ function renderFicha(){
     rows===1 ? h("input",{id:"f-"+k,value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; markDirty(); }})
              : h("textarea",{id:"f-"+k,rows:String(rows),value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; fitTA(e.target); markDirty(); }})));
   const since = S.turn - (S.memoryTurn||0);
-  root.replaceChildren(
+  root.replaceChildren(...[
     h("label",{class:"eco",for:"f-eco"},
       h("input",{type:"checkbox",id:"f-eco",checked:!!S.eco,onchange:(e)=>{ S.eco = e.target.checked; markDirty(); renderFicha(); toast({text: S.eco ? "Modo econômico ligado." : "Modo econômico desligado."}); }}),
       h("span",null, h("b",null,"Modo econômico"),
         h("small",null, S.eco
           ? "Ligado: o narrador usa um modelo mais leve, os personagens mandam DM e postam sozinhos com menos frequência, e a memória atualiza a cada 10 turnos."
-          : "Gasta menos do seu limite no Claude: narrador num modelo mais leve, menos DMs e posts automáticos, memória a cada 10 turnos."))),
+          : (SITE ? "Gasta menos crédito: narrador num modelo mais leve (Sonnet em vez de Opus), menos DMs e posts automáticos, memória a cada 10 turnos."
+                  : "Gasta menos do seu limite no Claude: narrador num modelo mais leve, menos DMs e posts automáticos, memória a cada 10 turnos.")))),
+    SITE ? h("div",{class:"f",style:"margin-top:18px"}, h("label",{for:"f-appkey"},"Senha do app"),
+      h("input",{id:"f-appkey",type:"password",autocomplete:"current-password",value:appKey(),placeholder:"A senha que você colocou na Cloudflare",onchange:(e)=>{ setAppKey(e.target.value.trim()); toast({text: e.target.value.trim() ? "Senha salva neste aparelho." : "Senha apagada."}); }})) : null,
     h("h2",null,"Ficha"),
     h("p",{class:"lead"},"Tudo aqui vai para o narrador e para os personagens. Edite quando quiser; vale a partir da próxima resposta."),
     ...fields,
@@ -1725,13 +1800,21 @@ function renderFicha(){
       h("div",{class:"f"}, h("label",{for:"f-memory"},`Turno ${S.turn} · atualizada no turno ${S.memoryTurn||0}`), h("textarea",{id:"f-memory",rows:"9",value:S.memory,oninput:(e)=>{ S.memory=e.target.value; fitTA(e.target); markDirty(); }})),
       h("div",{class:"memrow"}, h("span",null, since>=memEvery() ? "Atualiza depois da próxima resposta." : `Próxima atualização em ${memEvery()-since} ${memEvery()-since===1?"turno":"turnos"}.`),
         h("button",{class:"btn sm",disabled:UI.memBusy,onclick:()=>updateMemory(true)}, UI.memBusy ? "Atualizando…" : "Atualizar agora"))),
+    h("h2",null,"Backup"),
+    h("p",{class:"lead"},"Guarda a história, as redes, a ficha e as fotos num arquivo. Serve para levar o jogo do Claude para o site próprio, ou para outro aparelho."),
+    h("div",{class:"row",style:"flex-wrap:wrap"},
+      h("button",{class:"btn sm",disabled:!!UI.backupBusy,onclick:exportBackup}, UI.backupBusy ? "Preparando…" : "Baixar backup"),
+      h("label",{class:"btn ghost sm",for:"backupFile"},"Restaurar backup")),
+    UI.importPending ? h("div",{class:"confirm"},
+      h("div",null,`Restaurar o backup de ${new Date(UI.importPending.exportedAt||Date.now()).toLocaleString("pt-BR")}? Isso troca tudo o que está aqui pelo que está no arquivo.`),
+      h("div",{class:"row"}, h("button",{class:"btn primary",onclick:applyBackup},"Restaurar"), h("button",{class:"btn ghost",onclick:()=>{ UI.importPending=null; renderFicha(); }},"Cancelar"))) : null,
     h("div",{class:"danger"},
       h("p",null,"Recomeçar apaga a história, os posts, os tweets e as DMs, e volta para o prólogo. A ficha e as regras ficam."),
       UI.confirmReset
         ? h("div",{class:"confirm"}, h("div",null,"Apagar tudo e voltar ao prólogo? Não dá para desfazer."),
             h("div",{class:"row"}, h("button",{class:"btn primary",onclick:resetGame},"Apagar e recomeçar"), h("button",{class:"btn ghost",onclick:()=>{ UI.confirmReset=false; renderFicha(); }},"Cancelar")))
         : h("button",{class:"btn ghost",onclick:()=>{ UI.confirmReset=true; renderFicha(); }},"Recomeçar do zero"))
-  );
+  ].filter(Boolean));
   root.querySelectorAll("textarea").forEach(fitTA);
   $("#v-ficha").scrollTop = fichaScroll;
   if (focusedId){ const el = document.getElementById(focusedId); el?.focus(); }
@@ -1745,6 +1828,55 @@ function resetGame(){
   persist();
   setTab("historia");
   toast({text:"História recomeçada do prólogo."});
+}
+
+/* Backup */
+function referencedPhotos(){
+  const ids = new Set();
+  S.insta.posts.forEach(p=>p.photo && ids.add(p.photo));
+  S.insta.feed.forEach(p=>p.photo && ids.add(p.photo));
+  if (S.insta.avatar) ids.add(S.insta.avatar);
+  Object.values(S.gallery||{}).forEach(g=>{ (g.photos||[]).forEach(x=>ids.add(x.id)); if (g.avatar) ids.add(g.avatar); });
+  return [...ids];
+}
+async function exportBackup(){
+  UI.backupBusy = true; renderFicha();
+  try{
+    const photos = {};
+    for (const id of referencedPhotos()){ const d = await loadPhoto(id); if (d) photos[id] = d; }
+    const data = JSON.stringify({app:"gabrielle-salvatore", v:1, exportedAt:Date.now(), state:S, photos});
+    const name = `gabrielle-backup-${new Date().toISOString().slice(0,10)}.json`;
+    if (SITE){
+      const url = URL.createObjectURL(new Blob([data], {type:"application/json"}));
+      const a = h("a",{href:url, download:name}); document.body.append(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 5000);
+      toast({text:"Backup baixado."});
+    } else {
+      const dl = await window.claude.use("downloads");
+      if (!dl){ toast({text:"Baixar arquivos não funciona nesta tela. Abra o app no Claude pelo navegador e tente de novo."}); return; }
+      await dl.save({filename:name, data:new Blob([data], {type:"application/json"})});
+      toast({text:"Backup salvo."});
+    }
+  }catch(e){ if (e?.code !== "declined") toast({text:"Não deu para baixar o backup. Tente de novo."}); }
+  finally{ UI.backupBusy = false; renderFicha(); }
+}
+async function readBackupFile(f){
+  try{
+    const data = JSON.parse(await f.text());
+    if (data?.app !== "gabrielle-salvatore" || !Array.isArray(data.state?.story)) throw 0;
+    UI.importPending = data; renderFicha();
+  }catch{ toast({text:"Esse arquivo não é um backup do app."}); }
+}
+async function applyBackup(){
+  const data = UI.importPending; if (!data) return;
+  UI.importPending = null;
+  narrCtl?.abort();
+  for (const [id, d] of Object.entries(data.photos||{})) await storePhoto(id, d);
+  S = JSON.parse(JSON.stringify(data.state)); S.gallery ||= {}; S.queue ||= []; S.notifs ||= [];
+  UI.streaming = null; UI.storyErr = null; UI.thread = null; UI.sheet = null;
+  persist();
+  setTab("historia");
+  toast({text:"Backup restaurado."});
 }
 
 /* Toast */
@@ -1787,6 +1919,7 @@ $("#npFile").addEventListener("change",(e)=>{
   compressImage(f, 760, 0.8).then(img=>{ if (np.file===f){ np.url = img.dataURL; np.img = img; renderInsta(); } })
     .catch(()=>{ if (np.file===f){ np.file = null; toast({text:badImageMsg(f)}); renderInsta(); } });
 });
+$("#backupFile").addEventListener("change",(e)=>{ const f = e.target.files?.[0]; e.target.value = ""; if (f) readBackupFile(f); });
 $("#galFile").addEventListener("change",(e)=>{ const files = Array.from(e.target.files||[]); e.target.value = ""; if (UI.galTarget && files.length) addGallery(UI.galTarget, files); });
 document.addEventListener("visibilitychange",()=>{ if (document.hidden) persist(); });
 window.addEventListener("pagehide", persist);

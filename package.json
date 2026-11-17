@@ -1,0 +1,15 @@
+{
+  "name": "gabrielle-salvatore",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && wrangler pages dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.164.0"
+  }
+}
