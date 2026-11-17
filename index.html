@@ -644,39 +644,56 @@ async function loadPhoto(id){
   return null;
 }
 async function dropPhoto(id){ delete photoMem[id]; try{ localStorage.removeItem("gs:p:"+id); }catch{} if (Cloud){ try{ await photoCol().doc(id).delete(); }catch{} } }
-function compressImage(file, max=760, q=0.8){
+/* Abre a imagem de três jeitos, porque cada celular bloqueia um: link temporário, texto data: e bitmap. */
+function readAsDataURL(file){
+  return new Promise((res,rej)=>{ const fr = new FileReader(); fr.onload = ()=>res(fr.result); fr.onerror = ()=>rej(fr.error||new Error("read")); fr.readAsDataURL(file); });
+}
+function loadImg(src){
   return new Promise((res,rej)=>{
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = ()=>{
-      const sc = Math.min(1, max/Math.max(img.naturalWidth,img.naturalHeight));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.naturalWidth*sc); c.height = Math.round(img.naturalHeight*sc);
-      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-      URL.revokeObjectURL(url);
-      c.toBlob(blob=>{
-        if (!blob) return rej(new Error("blob"));
-        const fr = new FileReader(); fr.onload = ()=>res({blob, dataURL:fr.result}); fr.onerror = rej; fr.readAsDataURL(blob);
-      }, "image/jpeg", q);
-    };
-    img.onerror = async ()=>{
-      URL.revokeObjectURL(url);
-      try{
-        const bmp = await createImageBitmap(file);
-        const sc = Math.min(1, max/Math.max(bmp.width,bmp.height));
-        const c = document.createElement("canvas");
-        c.width = Math.round(bmp.width*sc); c.height = Math.round(bmp.height*sc);
-        c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
-        c.toBlob(blob=>{ if (!blob) return rej(new Error("blob")); const fr = new FileReader(); fr.onload = ()=>res({blob, dataURL:fr.result}); fr.onerror = rej; fr.readAsDataURL(blob); }, "image/jpeg", q);
-      }catch{ rej(new Error("img")); }
-    };
-    img.src = url;
+    const img = new Image(); let done = false;
+    const t = setTimeout(()=>{ if (!done){ done = true; rej(new Error("timeout")); } }, 10000);
+    img.onload = ()=>{ if (done) return; done = true; clearTimeout(t); img.naturalWidth ? res(img) : rej(new Error("empty")); };
+    img.onerror = ()=>{ if (done) return; done = true; clearTimeout(t); rej(new Error("decode")); };
+    img.src = src;
   });
+}
+async function decodeImage(file){
+  const tries = [];
+  tries.push(async ()=>{ const u = URL.createObjectURL(file); try{ return {src:await loadImg(u), w:0, h:0}; } finally{ setTimeout(()=>URL.revokeObjectURL(u), 1000); } });
+  tries.push(async ()=>({src:await loadImg(await readAsDataURL(file))}));
+  if (window.createImageBitmap) tries.push(async ()=>({src:await createImageBitmap(file)}));
+  let last;
+  for (const tr of tries){ try{ const r = await tr(); return r.src; }catch(e){ last = e; } }
+  throw last || new Error("decode");
+}
+function canvasOut(c, q){
+  return new Promise((res)=>{
+    const viaDataURL = ()=>{ try{ const d = c.toDataURL("image/jpeg", q); res({blob:dataURLtoBlob(d), dataURL:d}); }catch{ res(null); } };
+    try{
+      c.toBlob(async blob=>{
+        if (!blob) return viaDataURL();
+        try{ res({blob, dataURL:await readAsDataURL(blob)}); }catch{ viaDataURL(); }
+      }, "image/jpeg", q);
+    }catch{ viaDataURL(); }
+  });
+}
+async function compressImage(file, max=760, q=0.8){
+  const src = await decodeImage(file);
+  const W = src.naturalWidth || src.width, H = src.naturalHeight || src.height;
+  if (!W || !H) throw new Error("empty");
+  const sc = Math.min(1, max/Math.max(W,H));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(W*sc)); c.height = Math.max(1, Math.round(H*sc));
+  c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+  try{ src.close?.(); }catch{}
+  const out = await canvasOut(c, q);
+  if (!out || !out.dataURL || out.dataURL.length < 100) throw new Error("encode");
+  return out;
 }
 function badImageMsg(f){
   return /heic|heif/i.test((f?.type||"") + (f?.name||""))
     ? "Esse formato do iPhone (HEIC) não abriu aqui. Tire um print da foto e envie o print, ou escolha a foto pela galeria do app Fotos."
-    : "Não deu para abrir essa imagem. Tente outra foto.";
+    : `Não deu para abrir essa imagem (${f?.type||"tipo desconhecido"}, ${f?.size ? (f.size/1048576).toFixed(1)+" MB" : "?"}). Tente outra foto ou um print dela.`;
 }
 
 /* ============================================================
@@ -1031,7 +1048,7 @@ async function postPhoto(){
   const caption = ($("#npCaption")?.value||"").trim();
   np.busy = true; renderInsta();
   let img;
-  try{ img = await fitPhoto(np.file); }catch{ np.busy=false; toast({text:badImageMsg(np.file)}); renderInsta(); return; }
+  try{ img = (np.img && np.img.dataURL.length <= 230000) ? np.img : await fitPhoto(np.file); }catch{ np.busy=false; toast({text:badImageMsg(np.file)}); renderInsta(); return; }
   const id = uid();
   await storePhoto(id, img.dataURL);
   const post = {id, photo:id, caption, desc:"", likes:0, t:Date.now(), comments:[], status:"analyzing"};
@@ -1535,7 +1552,7 @@ function renderInsta(){
   let composer = null;
   if (np && UI.instaSeg==="perfil"){
     composer = h("div",{class:"newpost"},
-      np.url ? h("label",{for:"npFile",style:"cursor:pointer"}, h("img",{class:"pv",src:np.url,alt:"Prévia da foto"})) : h("label",{class:"drop",for:"npFile",style:"display:block"},"Escolher foto"),
+      np.url ? h("label",{for:"npFile",style:"cursor:pointer"}, h("img",{class:"pv",src:np.url,alt:"Prévia da foto"})) : h("label",{class:"drop",for:"npFile",style:"display:block"}, np.file ? "Abrindo foto…" : "Escolher foto"),
       h("textarea",{class:"field",id:"npCaption",rows:"2",placeholder:"Legenda…",style:"font-family:var(--f-ui);font-size:15px",value:np.caption||"",oninput:(e)=>{np.caption=e.target.value;}}),
       h("div",{class:"row",style:"justify-content:flex-end"}, h("button",{class:"btn primary",disabled:!np.file||np.busy,onclick:postPhoto}, np.busy ? "Postando…" : "Postar")));
   }
@@ -1751,8 +1768,9 @@ $("#avatarFile").addEventListener("change", async (e)=>{
 $("#npFile").addEventListener("change",(e)=>{
   const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
   const np = (UI.newPost ||= {});
-  np.file = f; if (np.url) URL.revokeObjectURL(np.url); np.url = URL.createObjectURL(f);
-  UI.instaSeg = "perfil"; renderInsta();
+  np.file = f; np.url = null; UI.instaSeg = "perfil"; renderInsta();
+  compressImage(f, 760, 0.8).then(img=>{ if (np.file===f){ np.url = img.dataURL; np.img = img; renderInsta(); } })
+    .catch(()=>{ if (np.file===f){ np.file = null; toast({text:badImageMsg(f)}); renderInsta(); } });
 });
 $("#galFile").addEventListener("change",(e)=>{ const files = Array.from(e.target.files||[]); e.target.value = ""; if (UI.galTarget && files.length) addGallery(UI.galTarget, files); });
 document.addEventListener("visibilitychange",()=>{ if (document.hidden) persist(); });
