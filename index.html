@@ -572,7 +572,7 @@ function trimState(){
 function markDirty(){ clearTimeout(saveTimer); saveTimer = setTimeout(persist, 1200); }
 function persist(){
   clearTimeout(saveTimer);
-  trimState();
+  try{ trimState(); }catch(e){ console.warn("trim", e); }
   S.savedAt = Date.now();
   saveLocal();
   if (Cloud) saveChain = saveChain.then(pushCloud).then(()=>setPill("cloud")).catch(e=>{ console.warn("save", e); setPill("err"); });
@@ -612,7 +612,7 @@ async function initCloud(){
         const qs = await storyCol().get();
         const docs = qs.docs.filter(x=>x.exists).sort((a,b)=>a.id<b.id?-1:1);
         const story = docs.flatMap(x=>x.data().msgs||[]);
-        S = {...d.data, story: story.length ? story : newGame().story};
+        S = JSON.parse(JSON.stringify({...d.data, story: story.length ? story : newGame().story}));
         S.gallery ||= {};
         lastChunkJSON = docs.map(x=>JSON.stringify(x.data().msgs||[]));
         saveLocal();
