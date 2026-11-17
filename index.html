@@ -274,6 +274,11 @@ label.btn{display:inline-flex;align-items:center;cursor:pointer}
 label.btn.off{opacity:.5;pointer-events:none}
 .avpick{cursor:pointer;display:grid;justify-items:center;gap:6px;font-size:12px;color:var(--rose)}
 
+.eco{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.eco input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.eco b{display:block;font-weight:600;font-size:14.5px}
+.eco small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
+
 /* Toast */
 .toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:50;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:10px;align-items:center;text-align:left;font-size:13.5px;animation:drop .25s ease-out}
 .toast .nt{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -878,7 +883,7 @@ async function runNarrator(turn){
   try{
     const ai = await needAI();
     const r = await ai(buildNarratorInput(turn), {
-      modelTier:"complex", cache:false, signal:narrCtl.signal,
+      modelTier: S.eco ? "default" : "complex", cache:false, signal:narrCtl.signal,
       onText:({text})=>{ if (UI.streaming){ UI.streaming.text = text; updateStream(); } },
     });
     if (S.turn < turn || !S.story.some(m=>m.turn===turn && m.role==="gabi")){ UI.streaming = null; renderStory(); return; }
@@ -939,9 +944,11 @@ function scheduleStoryEvent(ev, turn, delay=0){
 }
 async function afterTurn(turn){
   const gap = turn - (S.lastEventTurn||0);
-  if (turn >= 2 && (gap >= 6 || (gap >= 3 && Math.random() < 0.5))) runDirector(turn);
-  if (turn - (S.memoryTurn||0) >= 5) updateMemory();
+  const [gMax, gMin, chance] = S.eco ? [12, 6, 0.3] : [6, 3, 0.5];
+  if (turn >= 2 && (gap >= gMax || (gap >= gMin && Math.random() < chance))) runDirector(turn);
+  if (turn - (S.memoryTurn||0) >= memEvery()) updateMemory();
 }
+function memEvery(){ return S.eco ? 10 : 5; }
 async function runDirector(turn){
   try{
     const res = await askJSON(`Você coordena as redes sociais de um RPG de texto de The Vampire Diaries. Os personagens vivem a história e às vezes mexem no celular.
@@ -1697,6 +1704,12 @@ function renderFicha(){
              : h("textarea",{id:"f-"+k,rows:String(rows),value:S.ficha[k]||"",oninput:(e)=>{ S.ficha[k]=e.target.value; fitTA(e.target); markDirty(); }})));
   const since = S.turn - (S.memoryTurn||0);
   root.replaceChildren(
+    h("label",{class:"eco",for:"f-eco"},
+      h("input",{type:"checkbox",id:"f-eco",checked:!!S.eco,onchange:(e)=>{ S.eco = e.target.checked; markDirty(); renderFicha(); toast({text: S.eco ? "Modo econômico ligado." : "Modo econômico desligado."}); }}),
+      h("span",null, h("b",null,"Modo econômico"),
+        h("small",null, S.eco
+          ? "Ligado: o narrador usa um modelo mais leve, os personagens mandam DM e postam sozinhos com menos frequência, e a memória atualiza a cada 10 turnos."
+          : "Gasta menos do seu limite no Claude: narrador num modelo mais leve, menos DMs e posts automáticos, memória a cada 10 turnos."))),
     h("h2",null,"Ficha"),
     h("p",{class:"lead"},"Tudo aqui vai para o narrador e para os personagens. Edite quando quiser; vale a partir da próxima resposta."),
     ...fields,
@@ -1707,10 +1720,10 @@ function renderFicha(){
       return missing ? h("button",{class:"btn sm",disabled:UI.galDescBusy,onclick:describeMissing}, UI.galDescBusy ? "Descrevendo…" : "Descrever fotos sem descrição") : null; })(),
     galleryPanel(),
     h("h2",null,"Memória do mundo"),
-    h("p",{class:"lead"},"Um resumo do que já aconteceu. Ele se atualiza sozinho a cada 5 turnos, e você pode corrigir à mão."),
+    h("p",{class:"lead"},`Um resumo do que já aconteceu. Ele se atualiza sozinho a cada ${memEvery()} turnos, e você pode corrigir à mão.`),
     h("div",{class:"memory"},
       h("div",{class:"f"}, h("label",{for:"f-memory"},`Turno ${S.turn} · atualizada no turno ${S.memoryTurn||0}`), h("textarea",{id:"f-memory",rows:"9",value:S.memory,oninput:(e)=>{ S.memory=e.target.value; fitTA(e.target); markDirty(); }})),
-      h("div",{class:"memrow"}, h("span",null, since>=5 ? "Atualiza depois da próxima resposta." : `Próxima atualização em ${5-since} ${5-since===1?"turno":"turnos"}.`),
+      h("div",{class:"memrow"}, h("span",null, since>=memEvery() ? "Atualiza depois da próxima resposta." : `Próxima atualização em ${memEvery()-since} ${memEvery()-since===1?"turno":"turnos"}.`),
         h("button",{class:"btn sm",disabled:UI.memBusy,onclick:()=>updateMemory(true)}, UI.memBusy ? "Atualizando…" : "Atualizar agora"))),
     h("div",{class:"danger"},
       h("p",null,"Recomeçar apaga a história, os posts, os tweets e as DMs, e volta para o prólogo. A ficha e as regras ficam."),
