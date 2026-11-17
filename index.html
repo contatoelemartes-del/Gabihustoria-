@@ -279,6 +279,11 @@ label.btn.off{opacity:.5;pointer-events:none}
 .eco b{display:block;font-weight:600;font-size:14.5px}
 .eco small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
 
+.orph{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;padding-top:10px;border-top:1px solid var(--line)}
+.orph img{width:88px;height:88px;object-fit:cover;border-radius:8px;background:var(--surface-2)}
+.orph-r{display:grid;gap:8px;min-width:0}
+.orph select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-size:14px;width:100%}
+
 /* Toast */
 .toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:50;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:10px;align-items:center;text-align:left;font-size:13.5px;animation:drop .25s ease-out}
 .toast .nt{flex:1;min-width:0;overflow-wrap:anywhere}
@@ -461,7 +466,7 @@ function newGame(keep){
 const LKEY = "gs:state:v1";
 let S = loadLocal() || newGame();
 S.gallery ||= {};
-let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, backupBusy:false, importPending:null, galBusy:{}, galSel:null, galTarget:null, galDescBusy:false, lastTyping:false, feedBusy:false, twBusy:false};
+let UI = {tab:"historia", instaSeg:"perfil", thread:null, openTweet:null, sheet:null, newPost:null, streaming:null, storyErr:null, notifOpen:false, confirmReset:false, memBusy:false, dmPending:{}, dmAgain:{}, backupBusy:false, importPending:null, orphans:null, orphanBusy:false, galBusy:{}, galSel:null, galTarget:null, galDescBusy:false, lastTyping:false, feedBusy:false, twBusy:false};
 
 /* ============================================================
    Utilidades
@@ -1351,6 +1356,45 @@ function removeGal(w, id){
   if (g.avatar===id) g.avatar = null;
   UI.galSel = null; dropPhoto(id); markDirty(); renderFicha();
 }
+/* Fotos que estão salvas na conta mas não estão em nenhuma galeria (ex.: depois de uma perda de dados). */
+async function findOrphans(){
+  if (!Cloud) return;
+  UI.orphanBusy = true; renderFicha();
+  try{
+    const qs = await photoCol().get();
+    const used = new Set(referencedPhotos());
+    UI.orphans = qs.docs.filter(x=>x.exists && x.id.startsWith("g-") && !used.has(x.id))
+      .map(x=>{ const d = x.data(); photoMem[x.id] = d.d; return {id:x.id, t:d.t||0}; })
+      .sort((a,b)=>a.t-b.t);
+    if (!UI.orphans.length) toast({text:"Nenhuma foto sem personagem."});
+  }catch(e){ console.warn(e); toast({text:"Não deu para procurar as fotos agora. Tente de novo."}); }
+  finally{ UI.orphanBusy = false; renderFicha(); }
+}
+function assignOrphan(id, w){
+  if (!CHARS[w]) return;
+  const g = (S.gallery[w] ||= {photos:[], avatar:null});
+  const it = {id, desc:"", t:Date.now()};
+  g.photos.push(it);
+  UI.orphans = (UI.orphans||[]).filter(o=>o.id!==id);
+  markDirty(); renderFicha();
+  const d = photoMem[id];
+  if (d) describeGallery(w, [{it, blob:dataURLtoBlob(d)}]);
+}
+function orphanPanel(){
+  if (!UI.orphans?.length)
+    return h("div",{style:"margin-top:14px"}, h("button",{class:"btn ghost sm",disabled:!!UI.orphanBusy,onclick:findOrphans}, UI.orphanBusy ? "Procurando…" : "Procurar fotos sem personagem"));
+  return h("div",{class:"gal-sel",style:"margin-top:14px"},
+    h("p",null,`${UI.orphans.length} ${UI.orphans.length===1?"foto está salva":"fotos estão salvas"} na conta sem personagem. Escolha de quem é cada uma, ou apague.`),
+    UI.orphans.map(o=>{
+      const sel = h("select",{id:"orph-"+o.id,"aria-label":"Personagem"}, h("option",{value:""},"De quem é?"), CHAR_IDS.map(id=>h("option",{value:id},CHARS[id].name)));
+      return h("div",{class:"orph"},
+        h("img",{src:photoMem[o.id]||"",alt:"Foto sem personagem"}),
+        h("div",{class:"orph-r"}, sel,
+          h("div",{class:"row"},
+            h("button",{class:"btn sm",onclick:()=>{ if (sel.value) assignOrphan(o.id, sel.value); else toast({text:"Escolha o personagem primeiro."}); }},"Colocar"),
+            h("button",{class:"btn ghost sm",onclick:()=>{ dropPhoto(o.id); UI.orphans = UI.orphans.filter(x=>x.id!==o.id); renderFicha(); }},"Apagar"))));
+    }));
+}
 function galleryPanel(){
   const wrap = h("div",{class:"gal"});
   for (const id of CHAR_IDS){
@@ -1819,6 +1863,7 @@ function renderFicha(){
     (()=>{ const missing = CHAR_IDS.some(id=>(S.gallery[id]?.photos||[]).some(x=>!x.desc));
       return missing ? h("button",{class:"btn sm",disabled:UI.galDescBusy,onclick:describeMissing}, UI.galDescBusy ? "Descrevendo…" : "Descrever fotos sem descrição") : null; })(),
     galleryPanel(),
+    Cloud ? orphanPanel() : null,
     h("h2",null,"Memória do mundo"),
     h("p",{class:"lead"},`Um resumo do que já aconteceu. Ele se atualiza sozinho a cada ${memEvery()} turnos, e você pode corrigir à mão.`),
     h("div",{class:"memory"},
